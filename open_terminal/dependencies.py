@@ -3,6 +3,7 @@ from typing import Optional
 
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from starlette.requests import HTTPConnection
 
 from open_terminal.env import API_KEY, MULTI_USER
 from open_terminal.utils.fs import UserFS
@@ -12,6 +13,33 @@ if MULTI_USER:
 
 
 bearer_scheme = HTTPBearer(auto_error=False)
+
+
+def require_user_identity(connection: HTTPConnection) -> str | None:
+    """REQ-001 resource identity dependency (R2 skeleton; not yet wired).
+
+    Preconditions: HTTP callers run verify_api_key before this dependency; WS
+    callers validate the existing first-message service token before invoking
+    the shared identity parsing logic. This function never provisions accounts.
+
+    In multi-user mode require exactly one X-User-Id header (case insensitive
+    name), pass its original value to utils.identity.validate_user_id and return
+    that exact ID. Missing, duplicate or invalid values raise HTTPException(400)
+    with detail={"code": "invalid_user_identity", "message": "Invalid user identity"}.
+    No raw ID or credential is included. In explicit single-user mode return
+    None without requiring a header, importing Linux modules or creating state.
+
+    R4 must attach this only to user-resource HTTP routes, including list/control
+    routes which do not call get_filesystem. Metadata routes retain their existing
+    API-key policy and do not require identity. get_filesystem must also call it
+    because callers outside the route dependency chain use that function directly.
+    Do not make a general service-key check implicitly provision an account.
+
+    WS maps the same invalid identity to close code 4001 after authenticating;
+    valid identities use the existing user/chat ownership check (4004 on mismatch).
+    Keep WS transport error handling outside this HTTPException-based adapter.
+    """
+    raise NotImplementedError("REQ-001: implement resource identity dependency")
 
 
 def matches_api_key(token: object) -> bool:

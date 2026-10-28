@@ -12,13 +12,190 @@ import os
 import platform
 import pwd
 import re
+import secrets
 import shutil
 import subprocess
+from collections.abc import Collection
+
+from open_terminal.utils.identity import WorkspaceAccount, WorkspaceProvisionError
 
 log = logging.getLogger(__name__)
 
 # In-memory cache: upstream user-id → (os_username, home_dir)
 _user_cache: dict[str, tuple[str, str]] = {}
+
+# New-workspace contracts; the legacy functions below remain unchanged in R2.
+WORKSPACE_ID_MIN = 10001
+WORKSPACE_ID_MAX = 19999
+WORKSPACE_NAME_RANDOM_ATTEMPTS = 32
+
+
+def derive_workspace_username(user_id: str, prefix: str = "") -> str:
+    """Return the deterministic candidate OS name for an exact upstream ID.
+
+    First validate with identity.validate_user_id. Take the first eight lowercase
+    hex characters of SHA256 over the exact UTF-8 ID, then prepend prefix. Only
+    if that combined name starts with a digit, prepend 'u' to the whole name.
+    This preserves the old prefix-before-digit-check ordering. Hex letters are
+    a..f, not all a..z. For example: 'a' -> 'ca978112', 'alice' -> 'u2bd806c9',
+    and 'alice' with prefix='team_' -> 'team_2bd806c9'.
+
+    Prefix must be empty or fully match ``[a-z_][a-z0-9_]{0,6}``; invalid prefixes
+    raise ValueError. Without a prefix names have 8 or 9 characters. A nonempty
+    valid prefix already supplies a legal leading character, so no 'u' is added;
+    the total length is 9..15. The private group has exactly the same name.
+    There are no filesystem or OS-account side effects.
+
+    The truncated hash is only the first candidate, NOT ownership evidence.
+    For a previously unbound ID, provisioning skips any candidate reserved by
+    another ID or occupied by an OS account/group/home, then tries random
+    candidates from generate_workspace_username. Once a name has been durably
+    bound, reuse that recorded name; do not recompute or replace it on retry.
+    Eight hex characters are 32 bits and can collide; length is not proof of
+    uniqueness. IDs 'req001-collision-49585' and 'req001-collision-89826', for
+    example, both produce 'u19042bfe' without a prefix. Keep full IDs in the
+    registry and the full 64-character digest in the OS account marker.
+    Do not use the old sanitize_username output for new resource ownership.
+    """
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+
+
+def generate_workspace_username(prefix: str = "") -> str:
+    """Generate one short random candidate without inspecting or reserving it.
+
+    Validate prefix exactly as derive_workspace_username BEFORE requesting any
+    randomness; an invalid prefix raises ValueError. Obtain eight lowercase hex
+    characters using secrets.token_hex(4), prepend prefix, and prepend 'u' to
+    the combined name only when its first character is a digit. The name remains
+    8/9 characters with no prefix, or 9..15 with a valid nonempty prefix. Examples
+    of entropy output: 'abcdef01' -> 'abcdef01'; '1234abcd' -> 'u1234abcd'; the
+    latter with prefix='team_' -> 'team_1234abcd'. Do not lengthen a name with a
+    suffix. This helper accepts no upstream ID and makes no ownership decision.
+
+    Randomness does not prove uniqueness. WorkspaceProvisioner checks each
+    candidate against registry reservations and real accounts/groups/homes under
+    its existing global lock. It tries at most WORKSPACE_NAME_RANDOM_ATTEMPTS
+    random draws after the first deterministic candidate; repeated values count
+    toward the limit. All candidates occupied raises username_allocation_failed.
+    The final chosen name is durably recorded BEFORE any OS object is created.
+    The helper itself neither retries nor reads/writes persistent or OS state.
+    Entropy-source failures are wrapped by the resolver as workspace_unavailable.
+    """
+    raise NotImplementedError("REQ-001: implement short random username candidate")
+
+
+def allocate_workspace_ids(
+    occupied_uids: Collection[int], occupied_gids: Collection[int]
+) -> tuple[int, int]:
+    """Select the lowest available UID and GID independently, without mutation.
+
+    Inputs are snapshots of all occupied NSS IDs plus other in-progress mapping
+    reservations. Do not mutate these collections. Values outside the inclusive
+    10001..19999 interval have no effect. Return (uid, gid), each inside that
+    interval; uid need not equal gid. Duplicate occupied IDs have no extra effect.
+
+    If no UID is available raise WorkspaceProvisionError('uid_pool_exhausted');
+    otherwise if no GID is available raise ...('gid_pool_exhausted'). When both
+    pools are exhausted UID wins for deterministic diagnostics. Never allocate
+    outside the range. The caller holds the provisioning lock from snapshot to
+    actual user/group creation and checks BOTH pools before any OS mutation.
+    This helper alone cannot reserve IDs or serialize concurrent callers.
+    """
+    raise NotImplementedError("REQ-001: implement bounded independent ID allocation")
+
+
+class WorkspaceProvisioner:
+    """Prepare exact-ID workspaces against Linux NSS and a persistent registry.
+
+    R2 interface skeleton. R4 integrates resolve_user with this class, preserving
+    its existing (username, home) return type and existing UserFS/runner APIs.
+    Existing legacy implementations are deliberately retained until then.
+    """
+
+    def __init__(
+        self,
+        *,
+        state_dir: str = "/home/.open-terminal",
+        home_root: str = "/home",
+        username_prefix: str = "",
+    ):
+        """Store immutable deployment choices; do not create accounts here.
+
+        state_dir contains schema-v1 registry.json and an independent stable
+        provision.lock on the retained /home volume. It must be service-owned,
+        mode 0700, with 0600 registry/lock files; never placed in a workspace.
+        home_root is the absolute parent of generated homes. Explicit alternate
+        roots support isolated Linux tests; production uses the defaults above.
+        username_prefix follows derive_workspace_username's grammar and comes
+        from the existing USER_PREFIX setting. Invalid configuration fails before
+        mutation with workspace_config_invalid. Each registry record stores its
+        original prefix explicitly; compare that field, not a recomputed hash
+        name, because a recorded random fallback is valid. Registry bindings never
+        silently move when prefix or root configuration changes.
+        """
+        self.state_dir = state_dir
+        self.home_root = home_root
+        self.username_prefix = username_prefix
+
+    def resolve(self, user_id: str) -> WorkspaceAccount:
+        """Idempotently return a usable binding for an exact valid upstream ID.
+
+        Validate identity before touching persistent state. Serialize the entire
+        read/verify/reserve/create/repair/publish sequence using a process-wide
+        threading lock AND flock on provision.lock; all instances share that lock.
+        Lock acquisition has a total 30-second deadline (workspace_busy). The
+        registry is atomic JSON with fsync/replace and an unchanged lock inode.
+
+        New bindings: inspect NSS and all registry reservations under the lock.
+        Try the deterministic candidate first, then at most 32 random candidates
+        if the name, private group or home is occupied/reserved. Never adopt or
+        modify an occupied candidate, including an unrecorded directory/symlink.
+        If all attempts collide, raise username_allocation_failed without a new
+        binding or OS objects. This does not claim the entire name space is full.
+        Preflight both ID pools, durably record the chosen name, prefix, home and
+        numbers in planned ownership, then explicitly groupadd -g / useradd -u -g
+        with an explicit home and shell. Account GECOS is 'ot-' + the full SHA256
+        of the exact ID, even when its chosen username is random.
+        Never use -o/non-unique, change root/server/other users' IDs, or allocate
+        an out-of-range ID. Root, UID<1000, and the service real/effective UIDs
+        are never acceptable workspace accounts, even if a record names them.
+
+        Reuse: look up the exact ID BEFORE deriving or drawing a candidate. Use
+        its durably chosen name for planned/group_ready/ready, even after partial
+        failure, process restart or account recreation. Compare the entire ID,
+        recorded prefix/name/path, UID/GID, group and account marker; do not
+        require the name to equal derive_workspace_username(user_id). Conflicting
+        existing bindings fail identity_conflict, never get a new random name.
+        A present verified out-of-range account retains its IDs; an absent account
+        is recreated using the current interval and existing ownership record.
+        Inconsistent/corrupt/unknown-schema state fails closed; a symlink or
+        non-directory at an already bound home is identity_conflict. For an
+        unbound user, an unrecorded home entry (including a dangling symlink)
+        instead makes that candidate occupied and must be skipped. Do not infer
+        ownership from a name or file UID.
+
+        Retry: resume only objects belonging to a durable planned binding; see
+        the design's state transition/recovery table. Do not delete homes or run
+        blanket rollback/userdel on failure. Only the proven owner's directory
+        can be re-chowned after account recreation. Preserve file bytes/modes
+        except required owner and home-directory permission repair.
+
+        Before ready: private group has the account's name, home is 2770, server
+        has required group membership and current-process supplementary groups
+        are refreshed. Do not derive the server user from a client-controlled
+        environment variable. Retain existing optional Docker group behavior.
+        Required permission setup failure raises workspace_unavailable; do not
+        cache or return a partially prepared account as ready. Repeated calls
+        recheck readiness, including on a different process/instance.
+
+        Raises InvalidUserIdentity or WorkspaceProvisionError with stable code;
+        sanitized diagnostics contain no other-user data/credentials. OS errors
+        are wrapped; no fallback to service/default/shared account. Calls may
+        create OS accounts/groups, journal records and owned home permissions;
+        they never execute user commands or create a terminal/session. Expected
+        cases and response mapping are in docs/design/workspace-identity.md.
+        """
+        raise NotImplementedError("REQ-001: implement ownership-aware workspace preparation")
 
 
 def _run_privileged(cmd: list[str]) -> subprocess.CompletedProcess:

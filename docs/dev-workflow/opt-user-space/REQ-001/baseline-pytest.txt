@@ -1,0 +1,2008 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF............... [ 24%]
+.........................FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF............FFF [ 49%]
+FFFFFFFFFFFFFFFFFFFF..FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF [ 74%]
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF [ 99%]
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+____________ test_identity_dependency_preserves_the_exact_header[a] ____________
+tests/req001/test_identity_dependency.py:36: in test_identity_dependency_preserves_the_exact_header
+    assert adapter.require_user_identity(connection) == identity
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/dependencies.py:42: in require_user_identity
+    raise NotImplementedError("REQ-001: implement resource identity dependency")
+E   NotImplementedError: REQ-001: implement resource identity dependency
+__________ test_identity_dependency_preserves_the_exact_header[root] ___________
+tests/req001/test_identity_dependency.py:36: in test_identity_dependency_preserves_the_exact_header
+    assert adapter.require_user_identity(connection) == identity
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/dependencies.py:42: in require_user_identity
+    raise NotImplementedError("REQ-001: implement resource identity dependency")
+E   NotImplementedError: REQ-001: implement resource identity dependency
+__________ test_identity_dependency_preserves_the_exact_header[Alice] __________
+tests/req001/test_identity_dependency.py:36: in test_identity_dependency_preserves_the_exact_header
+    assert adapter.require_user_identity(connection) == identity
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/dependencies.py:42: in require_user_identity
+    raise NotImplementedError("REQ-001: implement resource identity dependency")
+E   NotImplementedError: REQ-001: implement resource identity dependency
+__________ test_identity_dependency_preserves_the_exact_header[alice] __________
+tests/req001/test_identity_dependency.py:36: in test_identity_dependency_preserves_the_exact_header
+    assert adapter.require_user_identity(connection) == identity
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/dependencies.py:42: in require_user_identity
+    raise NotImplementedError("REQ-001: implement resource identity dependency")
+E   NotImplementedError: REQ-001: implement resource identity dependency
+________ test_identity_dependency_preserves_the_exact_header[a.b:c@d-_] ________
+tests/req001/test_identity_dependency.py:36: in test_identity_dependency_preserves_the_exact_header
+    assert adapter.require_user_identity(connection) == identity
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/dependencies.py:42: in require_user_identity
+    raise NotImplementedError("REQ-001: implement resource identity dependency")
+E   NotImplementedError: REQ-001: implement resource identity dependency
+_ test_identity_dependency_preserves_the_exact_header[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa] _
+tests/req001/test_identity_dependency.py:36: in test_identity_dependency_preserves_the_exact_header
+    assert adapter.require_user_identity(connection) == identity
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/dependencies.py:42: in require_user_identity
+    raise NotImplementedError("REQ-001: implement resource identity dependency")
+E   NotImplementedError: REQ-001: implement resource identity dependency
+_ test_identity_dependency_rejects_missing_invalid_or_repeated_headers[headers0] _
+tests/req001/test_identity_dependency.py:53: in test_identity_dependency_rejects_missing_invalid_or_repeated_headers
+    adapter.require_user_identity(connection_with(headers))
+open_terminal/dependencies.py:42: in require_user_identity
+    raise NotImplementedError("REQ-001: implement resource identity dependency")
+E   NotImplementedError: REQ-001: implement resource identity dependency
+_ test_identity_dependency_rejects_missing_invalid_or_repeated_headers[headers1] _
+tests/req001/test_identity_dependency.py:53: in test_identity_dependency_rejects_missing_invalid_or_repeated_headers
+    adapter.require_user_identity(connection_with(headers))
+open_terminal/dependencies.py:42: in require_user_identity
+    raise NotImplementedError("REQ-001: implement resource identity dependency")
+E   NotImplementedError: REQ-001: implement resource identity dependency
+_ test_identity_dependency_rejects_missing_invalid_or_repeated_headers[headers2] _
+tests/req001/test_identity_dependency.py:53: in test_identity_dependency_rejects_missing_invalid_or_repeated_headers
+    adapter.require_user_identity(connection_with(headers))
+open_terminal/dependencies.py:42: in require_user_identity
+    raise NotImplementedError("REQ-001: implement resource identity dependency")
+E   NotImplementedError: REQ-001: implement resource identity dependency
+_ test_identity_dependency_rejects_missing_invalid_or_repeated_headers[headers3] _
+tests/req001/test_identity_dependency.py:53: in test_identity_dependency_rejects_missing_invalid_or_repeated_headers
+    adapter.require_user_identity(connection_with(headers))
+open_terminal/dependencies.py:42: in require_user_identity
+    raise NotImplementedError("REQ-001: implement resource identity dependency")
+E   NotImplementedError: REQ-001: implement resource identity dependency
+_ test_identity_dependency_rejects_missing_invalid_or_repeated_headers[headers4] _
+tests/req001/test_identity_dependency.py:53: in test_identity_dependency_rejects_missing_invalid_or_repeated_headers
+    adapter.require_user_identity(connection_with(headers))
+open_terminal/dependencies.py:42: in require_user_identity
+    raise NotImplementedError("REQ-001: implement resource identity dependency")
+E   NotImplementedError: REQ-001: implement resource identity dependency
+_ test_identity_dependency_rejects_missing_invalid_or_repeated_headers[headers5] _
+tests/req001/test_identity_dependency.py:53: in test_identity_dependency_rejects_missing_invalid_or_repeated_headers
+    adapter.require_user_identity(connection_with(headers))
+open_terminal/dependencies.py:42: in require_user_identity
+    raise NotImplementedError("REQ-001: implement resource identity dependency")
+E   NotImplementedError: REQ-001: implement resource identity dependency
+_ test_identity_dependency_rejects_missing_invalid_or_repeated_headers[headers6] _
+tests/req001/test_identity_dependency.py:53: in test_identity_dependency_rejects_missing_invalid_or_repeated_headers
+    adapter.require_user_identity(connection_with(headers))
+open_terminal/dependencies.py:42: in require_user_identity
+    raise NotImplementedError("REQ-001: implement resource identity dependency")
+E   NotImplementedError: REQ-001: implement resource identity dependency
+__ test_identity_dependency_accepts_a_websocket_connection_after_service_auth __
+tests/req001/test_identity_dependency.py:63: in test_identity_dependency_accepts_a_websocket_connection_after_service_auth
+    assert adapter.require_user_identity(connection) == "Alice"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/dependencies.py:42: in require_user_identity
+    raise NotImplementedError("REQ-001: implement resource identity dependency")
+E   NotImplementedError: REQ-001: implement resource identity dependency
+_ test_explicit_single_user_mode_needs_no_identity_or_linux_provisioning[headers0] _
+tests/req001/test_identity_dependency.py:88: in test_explicit_single_user_mode_needs_no_identity_or_linux_provisioning
+    identity = adapter.require_user_identity(connection_with(headers))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/dependencies.py:42: in require_user_identity
+    raise NotImplementedError("REQ-001: implement resource identity dependency")
+E   NotImplementedError: REQ-001: implement resource identity dependency
+_ test_explicit_single_user_mode_needs_no_identity_or_linux_provisioning[headers1] _
+tests/req001/test_identity_dependency.py:88: in test_explicit_single_user_mode_needs_no_identity_or_linux_provisioning
+    identity = adapter.require_user_identity(connection_with(headers))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/dependencies.py:42: in require_user_identity
+    raise NotImplementedError("REQ-001: implement resource identity dependency")
+E   NotImplementedError: REQ-001: implement resource identity dependency
+_ test_explicit_single_user_mode_needs_no_identity_or_linux_provisioning[headers2] _
+tests/req001/test_identity_dependency.py:88: in test_explicit_single_user_mode_needs_no_identity_or_linux_provisioning
+    identity = adapter.require_user_identity(connection_with(headers))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/dependencies.py:42: in require_user_identity
+    raise NotImplementedError("REQ-001: implement resource identity dependency")
+E   NotImplementedError: REQ-001: implement resource identity dependency
+_________ test_every_resource_route_rejects_missing_identity[cwd-read] _________
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+________ test_every_resource_route_rejects_missing_identity[cwd-write] _________
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+_______ test_every_resource_route_rejects_missing_identity[skills-list] ________
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+_______ test_every_resource_route_rejects_missing_identity[skills-read] ________
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+________ test_every_resource_route_rejects_missing_identity[files-list] ________
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+______ test_every_resource_route_rejects_missing_identity[files-compare] _______
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+________ test_every_resource_route_rejects_missing_identity[files-read] ________
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+______ test_every_resource_route_rejects_missing_identity[files-display] _______
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+________ test_every_resource_route_rejects_missing_identity[files-view] ________
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+_______ test_every_resource_route_rejects_missing_identity[files-serve] ________
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+_______ test_every_resource_route_rejects_missing_identity[files-write] ________
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+_______ test_every_resource_route_rejects_missing_identity[files-mkdir] ________
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+_______ test_every_resource_route_rejects_missing_identity[files-delete] _______
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+________ test_every_resource_route_rejects_missing_identity[files-move] ________
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+______ test_every_resource_route_rejects_missing_identity[files-replace] _______
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+________ test_every_resource_route_rejects_missing_identity[files-grep] ________
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+______ test_every_resource_route_rejects_missing_identity[files-matches] _______
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+_______ test_every_resource_route_rejects_missing_identity[files-search] _______
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+________ test_every_resource_route_rejects_missing_identity[files-glob] ________
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+_______ test_every_resource_route_rejects_missing_identity[files-upload] _______
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+______ test_every_resource_route_rejects_missing_identity[files-archive] _______
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+______ test_every_resource_route_rejects_missing_identity[processes-list] ______
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: []
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+______ test_every_resource_route_rejects_missing_identity[process-create] ______
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+______ test_every_resource_route_rejects_missing_identity[process-status] ______
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: {"detail":"Process not found"}
+E   assert 404 == 400
+E    +  where 404 = <Response [404 Not Found]>.status_code
+______ test_every_resource_route_rejects_missing_identity[process-input] _______
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: {"detail":"Process not found"}
+E   assert 404 == 400
+E    +  where 404 = <Response [404 Not Found]>.status_code
+______ test_every_resource_route_rejects_missing_identity[process-delete] ______
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: {"detail":"Process not found"}
+E   assert 404 == 400
+E    +  where 404 = <Response [404 Not Found]>.status_code
+________ test_every_resource_route_rejects_missing_identity[ports-list] ________
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: {"ports":[]}
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+______ test_every_resource_route_rejects_missing_identity[port-proxy-get] ______
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: {"detail":"Port not found"}
+E   assert 404 == 400
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_____ test_every_resource_route_rejects_missing_identity[port-proxy-post] ______
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: {"detail":"Port not found"}
+E   assert 404 == 400
+E    +  where 404 = <Response [404 Not Found]>.status_code
+______ test_every_resource_route_rejects_missing_identity[port-proxy-put] ______
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: {"detail":"Port not found"}
+E   assert 404 == 400
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_____ test_every_resource_route_rejects_missing_identity[port-proxy-patch] _____
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: {"detail":"Port not found"}
+E   assert 404 == 400
+E    +  where 404 = <Response [404 Not Found]>.status_code
+____ test_every_resource_route_rejects_missing_identity[port-proxy-delete] _____
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: {"detail":"Port not found"}
+E   assert 404 == 400
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_____ test_every_resource_route_rejects_missing_identity[port-proxy-head] ______
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError:
+E   assert 404 == 400
+E    +  where 404 = <Response [404 Not Found]>.status_code
+____ test_every_resource_route_rejects_missing_identity[port-proxy-options] ____
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: {"detail":"Port not found"}
+E   assert 404 == 400
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_____ test_every_resource_route_rejects_missing_identity[terminal-create] ______
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+______ test_every_resource_route_rejects_missing_identity[terminals-list] ______
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: []
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_______ test_every_resource_route_rejects_missing_identity[terminal-get] _______
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: {"error":"Session not found"}
+E   assert 404 == 400
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_____ test_every_resource_route_rejects_missing_identity[terminal-delete] ______
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: {"error":"Session not found"}
+E   assert 404 == 400
+E    +  where 404 = <Response [404 Not Found]>.status_code
+___ test_every_resource_route_rejects_missing_identity[terminal-user-output] ___
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: {"detail":"No connected user shell"}
+E   assert 404 == 400
+E    +  where 404 = <Response [404 Not Found]>.status_code
+___ test_every_resource_route_rejects_missing_identity[terminal-user-input] ____
+tests/req001/test_identity_http.py:97: in test_every_resource_route_rejects_missing_identity
+    assert_identity_denied(response, method)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: {"detail":"No connected user shell"}
+E   assert 404 == 400
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[-/files/cwd] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:88: in assert_identity_denied
+    assert isinstance(detail, dict), f"Expected structured identity error, got {detail!r}"
+E   AssertionError: Expected structured identity error, got 'X-User-Id is required in multi-user mode'
+E   assert False
+E    +  where False = isinstance('X-User-Id is required in multi-user mode', dict)
+_ test_resource_families_reject_invalid_identity_without_provisioning[-/execute] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: []
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[-/ports] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: {"ports":[]}
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[-/api/terminals] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: []
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[ -/files/cwd] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: Internal Server Error
+E   assert 500 == 400
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[ -/execute] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: []
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[ -/ports] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: {"ports":[]}
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[ -/api/terminals] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: []
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[ alice-/files/cwd] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: Internal Server Error
+E   assert 500 == 400
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[ alice-/execute] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: []
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[ alice-/ports] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: {"ports":[]}
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[ alice-/api/terminals] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: []
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[alice -/files/cwd] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: Internal Server Error
+E   assert 500 == 400
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[alice -/execute] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: []
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[alice -/ports] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: {"ports":[]}
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[alice -/api/terminals] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: []
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[alice/bob-/files/cwd] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: Internal Server Error
+E   assert 500 == 400
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[alice/bob-/execute] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: []
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[alice/bob-/ports] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: {"ports":[]}
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[alice/bob-/api/terminals] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: []
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-/files/cwd] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: Internal Server Error
+E   assert 500 == 400
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-/execute] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: []
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-/ports] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: {"ports":[]}
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_resource_families_reject_invalid_identity_without_provisioning[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-/api/terminals] _
+tests/req001/test_identity_http.py:123: in test_resource_families_reject_invalid_identity_without_provisioning
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: []
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value[alice-/files/cwd] _
+tests/req001/test_identity_http.py:138: in test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: Internal Server Error
+E   assert 500 == 400
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+_ test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value[alice-/execute] _
+tests/req001/test_identity_http.py:138: in test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: []
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value[alice-/ports] _
+tests/req001/test_identity_http.py:138: in test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: {"ports":[]}
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value[alice-/api/terminals] _
+tests/req001/test_identity_http.py:138: in test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: []
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value[bob-/files/cwd] _
+tests/req001/test_identity_http.py:138: in test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: Internal Server Error
+E   assert 500 == 400
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+_ test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value[bob-/execute] _
+tests/req001/test_identity_http.py:138: in test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: []
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value[bob-/ports] _
+tests/req001/test_identity_http.py:138: in test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: {"ports":[]}
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value[bob-/api/terminals] _
+tests/req001/test_identity_http.py:138: in test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value
+    assert_identity_denied(response)
+tests/req001/test_identity_http.py:83: in assert_identity_denied
+    assert response.status_code == 400, response.text
+E   AssertionError: []
+E   assert 200 == 400
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_provisioning_errors_remain_diagnostic_without_leaking_details[/files/cwd-uid_pool_exhausted-503] _
+tests/req001/test_identity_http.py:214: in test_provisioning_errors_remain_diagnostic_without_leaking_details
+    assert response.status_code == status, response.text
+E   AssertionError: Internal Server Error
+E   assert 500 == 503
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+_ test_provisioning_errors_remain_diagnostic_without_leaking_details[/files/cwd-gid_pool_exhausted-503] _
+tests/req001/test_identity_http.py:214: in test_provisioning_errors_remain_diagnostic_without_leaking_details
+    assert response.status_code == status, response.text
+E   AssertionError: Internal Server Error
+E   assert 500 == 503
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+_ test_provisioning_errors_remain_diagnostic_without_leaking_details[/files/cwd-username_allocation_failed-503] _
+tests/req001/test_identity_http.py:214: in test_provisioning_errors_remain_diagnostic_without_leaking_details
+    assert response.status_code == status, response.text
+E   AssertionError: Internal Server Error
+E   assert 500 == 503
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+_ test_provisioning_errors_remain_diagnostic_without_leaking_details[/files/cwd-workspace_busy-503] _
+tests/req001/test_identity_http.py:214: in test_provisioning_errors_remain_diagnostic_without_leaking_details
+    assert response.status_code == status, response.text
+E   AssertionError: Internal Server Error
+E   assert 500 == 503
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+_ test_provisioning_errors_remain_diagnostic_without_leaking_details[/files/cwd-workspace_unavailable-503] _
+tests/req001/test_identity_http.py:214: in test_provisioning_errors_remain_diagnostic_without_leaking_details
+    assert response.status_code == status, response.text
+E   AssertionError: Internal Server Error
+E   assert 500 == 503
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+_ test_provisioning_errors_remain_diagnostic_without_leaking_details[/files/cwd-identity_conflict-409] _
+tests/req001/test_identity_http.py:214: in test_provisioning_errors_remain_diagnostic_without_leaking_details
+    assert response.status_code == status, response.text
+E   AssertionError: Internal Server Error
+E   assert 500 == 409
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+_ test_provisioning_errors_remain_diagnostic_without_leaking_details[/files/cwd-workspace_state_invalid-500] _
+tests/req001/test_identity_http.py:215: in test_provisioning_errors_remain_diagnostic_without_leaking_details
+    assert "application/json" in response.headers.get("content-type", ""), response.text
+E   AssertionError: Internal Server Error
+E   assert 'application/json' in 'text/plain; charset=utf-8'
+E    +  where 'text/plain; charset=utf-8' = get('content-type', '')
+E    +    where get = Headers({'content-length': '21', 'content-type': 'text/plain; charset=utf-8'}).get
+E    +      where Headers({'content-length': '21', 'content-type': 'text/plain; charset=utf-8'}) = <Response [500 Internal Server Error]>.headers
+_ test_provisioning_errors_remain_diagnostic_without_leaking_details[/files/cwd-workspace_config_invalid-500] _
+tests/req001/test_identity_http.py:215: in test_provisioning_errors_remain_diagnostic_without_leaking_details
+    assert "application/json" in response.headers.get("content-type", ""), response.text
+E   AssertionError: Internal Server Error
+E   assert 'application/json' in 'text/plain; charset=utf-8'
+E    +  where 'text/plain; charset=utf-8' = get('content-type', '')
+E    +    where get = Headers({'content-length': '21', 'content-type': 'text/plain; charset=utf-8'}).get
+E    +      where Headers({'content-length': '21', 'content-type': 'text/plain; charset=utf-8'}) = <Response [500 Internal Server Error]>.headers
+_ test_provisioning_errors_remain_diagnostic_without_leaking_details[/ports-uid_pool_exhausted-503] _
+tests/req001/test_identity_http.py:214: in test_provisioning_errors_remain_diagnostic_without_leaking_details
+    assert response.status_code == status, response.text
+E   AssertionError: {"ports":[]}
+E   assert 200 == 503
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_provisioning_errors_remain_diagnostic_without_leaking_details[/ports-username_allocation_failed-503] _
+tests/req001/test_identity_http.py:214: in test_provisioning_errors_remain_diagnostic_without_leaking_details
+    assert response.status_code == status, response.text
+E   AssertionError: {"ports":[]}
+E   assert 200 == 503
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_provisioning_errors_remain_diagnostic_without_leaking_details[/ports-identity_conflict-409] _
+tests/req001/test_identity_http.py:214: in test_provisioning_errors_remain_diagnostic_without_leaking_details
+    assert response.status_code == status, response.text
+E   AssertionError: {"ports":[]}
+E   assert 200 == 409
+E    +  where 200 = <Response [200 OK]>.status_code
+_ test_provisioning_errors_remain_diagnostic_without_leaking_details[/proxy/18080/-gid_pool_exhausted-503] _
+tests/req001/test_identity_http.py:214: in test_provisioning_errors_remain_diagnostic_without_leaking_details
+    assert response.status_code == status, response.text
+E   AssertionError: {"detail":"Port not found"}
+E   assert 404 == 503
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_ test_provisioning_errors_remain_diagnostic_without_leaking_details[/proxy/18080/-workspace_state_invalid-500] _
+tests/req001/test_identity_http.py:214: in test_provisioning_errors_remain_diagnostic_without_leaking_details
+    assert response.status_code == status, response.text
+E   AssertionError: {"detail":"Port not found"}
+E   assert 404 == 500
+E    +  where 404 = <Response [404 Not Found]>.status_code
+_ test_websocket_authentication_precedes_lookup_of_a_missing_terminal[payload0] _
+tests/req001/test_identity_http.py:241: in test_websocket_authentication_precedes_lookup_of_a_missing_terminal
+    assert rejected.value.code == 4001
+E   assert 4004 == 4001
+E    +  where 4004 = WebSocketDisconnect().code
+E    +    where WebSocketDisconnect() = <ExceptionInfo WebSocketDisconnect() tblen=3>.value
+_ test_websocket_authentication_precedes_lookup_of_a_missing_terminal[payload1] _
+tests/req001/test_identity_http.py:241: in test_websocket_authentication_precedes_lookup_of_a_missing_terminal
+    assert rejected.value.code == 4001
+E   assert 4004 == 4001
+E    +  where 4004 = WebSocketDisconnect().code
+E    +    where WebSocketDisconnect() = <ExceptionInfo WebSocketDisconnect() tblen=3>.value
+_ test_websocket_authentication_precedes_lookup_of_a_missing_terminal[payload2] _
+tests/req001/test_identity_http.py:241: in test_websocket_authentication_precedes_lookup_of_a_missing_terminal
+    assert rejected.value.code == 4001
+E   assert 4004 == 4001
+E    +  where 4004 = WebSocketDisconnect().code
+E    +    where WebSocketDisconnect() = <ExceptionInfo WebSocketDisconnect() tblen=3>.value
+_ test_websocket_authentication_precedes_lookup_of_a_missing_terminal[payload3] _
+tests/req001/test_identity_http.py:241: in test_websocket_authentication_precedes_lookup_of_a_missing_terminal
+    assert rejected.value.code == 4001
+E   assert 4004 == 4001
+E    +  where 4004 = WebSocketDisconnect().code
+E    +    where WebSocketDisconnect() = <ExceptionInfo WebSocketDisconnect() tblen=3>.value
+__ test_websocket_identity_is_checked_after_key_before_resource_lookup[None] ___
+tests/req001/test_identity_http.py:252: in test_websocket_identity_is_checked_after_key_before_resource_lookup
+    assert rejected.value.code == 4001
+E   assert 4004 == 4001
+E    +  where 4004 = WebSocketDisconnect().code
+E    +    where WebSocketDisconnect() = <ExceptionInfo WebSocketDisconnect() tblen=3>.value
+____ test_websocket_identity_is_checked_after_key_before_resource_lookup[] _____
+tests/req001/test_identity_http.py:252: in test_websocket_identity_is_checked_after_key_before_resource_lookup
+    assert rejected.value.code == 4001
+E   assert 4004 == 4001
+E    +  where 4004 = WebSocketDisconnect().code
+E    +    where WebSocketDisconnect() = <ExceptionInfo WebSocketDisconnect() tblen=3>.value
+____ test_websocket_identity_is_checked_after_key_before_resource_lookup[ ] ____
+tests/req001/test_identity_http.py:252: in test_websocket_identity_is_checked_after_key_before_resource_lookup
+    assert rejected.value.code == 4001
+E   assert 4004 == 4001
+E    +  where 4004 = WebSocketDisconnect().code
+E    +    where WebSocketDisconnect() = <ExceptionInfo WebSocketDisconnect() tblen=3>.value
+_ test_websocket_identity_is_checked_after_key_before_resource_lookup[alice/bob] _
+tests/req001/test_identity_http.py:252: in test_websocket_identity_is_checked_after_key_before_resource_lookup
+    assert rejected.value.code == 4001
+E   assert 4004 == 4001
+E    +  where 4004 = WebSocketDisconnect().code
+E    +    where WebSocketDisconnect() = <ExceptionInfo WebSocketDisconnect() tblen=3>.value
+_ test_websocket_identity_is_checked_after_key_before_resource_lookup[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa] _
+tests/req001/test_identity_http.py:252: in test_websocket_identity_is_checked_after_key_before_resource_lookup
+    assert rejected.value.code == 4001
+E   assert 4004 == 4001
+E    +  where 4004 = WebSocketDisconnect().code
+E    +    where WebSocketDisconnect() = <ExceptionInfo WebSocketDisconnect() tblen=3>.value
+______________ test_websocket_rejects_duplicate_identity_headers _______________
+tests/req001/test_identity_http.py:263: in test_websocket_rejects_duplicate_identity_headers
+    assert rejected.value.code == 4001
+E   assert 4004 == 4001
+E    +  where 4004 = WebSocketDisconnect().code
+E    +    where WebSocketDisconnect() = <ExceptionInfo WebSocketDisconnect() tblen=3>.value
+_______________ test_supported_identity_is_returned_verbatim[a] ________________
+tests/req001/test_identity_values.py:29: in test_supported_identity_is_returned_verbatim
+    assert validate_user_id(value) == value
+           ^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+_______________ test_supported_identity_is_returned_verbatim[0] ________________
+tests/req001/test_identity_values.py:29: in test_supported_identity_is_returned_verbatim
+    assert validate_user_id(value) == value
+           ^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+______________ test_supported_identity_is_returned_verbatim[root] ______________
+tests/req001/test_identity_values.py:29: in test_supported_identity_is_returned_verbatim
+    assert validate_user_id(value) == value
+           ^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+____________ test_supported_identity_is_returned_verbatim[service] _____________
+tests/req001/test_identity_values.py:29: in test_supported_identity_is_returned_verbatim
+    assert validate_user_id(value) == value
+           ^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+______________ test_supported_identity_is_returned_verbatim[ABCD] ______________
+tests/req001/test_identity_values.py:29: in test_supported_identity_is_returned_verbatim
+    assert validate_user_id(value) == value
+           ^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+______________ test_supported_identity_is_returned_verbatim[abcd] ______________
+tests/req001/test_identity_values.py:29: in test_supported_identity_is_returned_verbatim
+    assert validate_user_id(value) == value
+           ^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+_ test_supported_identity_is_returned_verbatim[12345678-abcd-4321-abcd-123456789abc] _
+tests/req001/test_identity_values.py:29: in test_supported_identity_is_returned_verbatim
+    assert validate_user_id(value) == value
+           ^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+___________ test_supported_identity_is_returned_verbatim[a.b:c@d-_] ____________
+tests/req001/test_identity_values.py:29: in test_supported_identity_is_returned_verbatim
+    assert validate_user_id(value) == value
+           ^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+_ test_supported_identity_is_returned_verbatim[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa] _
+tests/req001/test_identity_values.py:29: in test_supported_identity_is_returned_verbatim
+    assert validate_user_id(value) == value
+           ^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+____________________ test_case_distinct_ids_remain_distinct ____________________
+tests/req001/test_identity_values.py:34: in test_case_distinct_ids_remain_distinct
+    assert validate_user_id("Alice") != validate_user_id("alice")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+______________ test_unsupported_identity_has_a_domain_error[None] ______________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+________________ test_unsupported_identity_has_a_domain_error[] ________________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+_______________ test_unsupported_identity_has_a_domain_error[ ] ________________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+_____________ test_unsupported_identity_has_a_domain_error[ alice] _____________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+_____________ test_unsupported_identity_has_a_domain_error[alice ] _____________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+___________ test_unsupported_identity_has_a_domain_error[alice bob] ____________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+____________ test_unsupported_identity_has_a_domain_error[\talice] _____________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+____________ test_unsupported_identity_has_a_domain_error[alice\n] _____________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+__________ test_unsupported_identity_has_a_domain_error[alice\r\nBob] __________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+___________ test_unsupported_identity_has_a_domain_error[alice\x00] ____________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+___________ test_unsupported_identity_has_a_domain_error[alice\x7f] ____________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+__________ test_unsupported_identity_has_a_domain_error[\u7528\u6237] __________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+____________ test_unsupported_identity_has_a_domain_error[caf\xe9] _____________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+____________ test_unsupported_identity_has_a_domain_error[a\u200bb] ____________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+____________ test_unsupported_identity_has_a_domain_error[../alice] ____________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+___________ test_unsupported_identity_has_a_domain_error[alice/bob] ____________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+___________ test_unsupported_identity_has_a_domain_error[alice\\bob] ___________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+___________ test_unsupported_identity_has_a_domain_error[alice,bob] ____________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+_____________ test_unsupported_identity_has_a_domain_error[-alice] _____________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+_____________ test_unsupported_identity_has_a_domain_error[_alice] _____________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+_____________ test_unsupported_identity_has_a_domain_error[.alice] _____________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+_____________ test_unsupported_identity_has_a_domain_error[:alice] _____________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+_____________ test_unsupported_identity_has_a_domain_error[@alice] _____________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+_ test_unsupported_identity_has_a_domain_error[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa] _
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+_______________ test_unsupported_identity_has_a_domain_error[1] ________________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+_____________ test_unsupported_identity_has_a_domain_error[False] ______________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+_____________ test_unsupported_identity_has_a_domain_error[alice] ______________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+____________ test_unsupported_identity_has_a_domain_error[value27] _____________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+____________ test_unsupported_identity_has_a_domain_error[value28] _____________
+tests/req001/test_identity_values.py:74: in test_unsupported_identity_has_a_domain_error
+    validate_user_id(value)
+open_terminal/utils/identity.py:77: in validate_user_id
+    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+E   NotImplementedError: REQ-001: implement exact upstream identity validation
+_________ test_username_is_stable_bounded_and_not_an_input_account[a] __________
+tests/req001/test_workspace_provisioning.py:34: in test_username_is_stable_bounded_and_not_an_input_account
+    name = derive_workspace_username(user_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+________ test_username_is_stable_bounded_and_not_an_input_account[root] ________
+tests/req001/test_workspace_provisioning.py:34: in test_username_is_stable_bounded_and_not_an_input_account
+    name = derive_workspace_username(user_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+________ test_username_is_stable_bounded_and_not_an_input_account[user] ________
+tests/req001/test_workspace_provisioning.py:34: in test_username_is_stable_bounded_and_not_an_input_account
+    name = derive_workspace_username(user_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_______ test_username_is_stable_bounded_and_not_an_input_account[Alice] ________
+tests/req001/test_workspace_provisioning.py:34: in test_username_is_stable_bounded_and_not_an_input_account
+    name = derive_workspace_username(user_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_____ test_username_is_stable_bounded_and_not_an_input_account[A.b:c@d-_] ______
+tests/req001/test_workspace_provisioning.py:34: in test_username_is_stable_bounded_and_not_an_input_account
+    name = derive_workspace_username(user_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_username_is_stable_bounded_and_not_an_input_account[99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999] _
+tests/req001/test_workspace_provisioning.py:34: in test_username_is_stable_bounded_and_not_an_input_account
+    name = derive_workspace_username(user_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[a-ca978112] _
+tests/req001/test_workspace_provisioning.py:67: in test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard
+    assert derive_workspace_username(user_id) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[abc-ba7816bf] _
+tests/req001/test_workspace_provisioning.py:67: in test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard
+    assert derive_workspace_username(user_id) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[alice-u2bd806c9] _
+tests/req001/test_workspace_provisioning.py:67: in test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard
+    assert derive_workspace_username(user_id) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-1-u0899cd85] _
+tests/req001/test_workspace_provisioning.py:67: in test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard
+    assert derive_workspace_username(user_id) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-9-u1a9f9193] _
+tests/req001/test_workspace_provisioning.py:67: in test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard
+    assert derive_workspace_username(user_id) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-2-u2be9fec9] _
+tests/req001/test_workspace_provisioning.py:67: in test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard
+    assert derive_workspace_username(user_id) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-12-u3a7d1f95] _
+tests/req001/test_workspace_provisioning.py:67: in test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard
+    assert derive_workspace_username(user_id) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-35-u45ea2d13] _
+tests/req001/test_workspace_provisioning.py:67: in test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard
+    assert derive_workspace_username(user_id) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-24-u595b6ec3] _
+tests/req001/test_workspace_provisioning.py:67: in test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard
+    assert derive_workspace_username(user_id) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-4-u6e16930f] _
+tests/req001/test_workspace_provisioning.py:67: in test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard
+    assert derive_workspace_username(user_id) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-3-u73014671] _
+tests/req001/test_workspace_provisioning.py:67: in test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard
+    assert derive_workspace_username(user_id) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-23-u839c3dfb] _
+tests/req001/test_workspace_provisioning.py:67: in test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard
+    assert derive_workspace_username(user_id) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-22-u964e7ddb] _
+tests/req001/test_workspace_provisioning.py:67: in test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard
+    assert derive_workspace_username(user_id) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-0-a5bb10eb] _
+tests/req001/test_workspace_provisioning.py:67: in test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard
+    assert derive_workspace_username(user_id) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-8-b1b7dd7a] _
+tests/req001/test_workspace_provisioning.py:67: in test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard
+    assert derive_workspace_username(user_id) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-33-ca1eed8e] _
+tests/req001/test_workspace_provisioning.py:67: in test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard
+    assert derive_workspace_username(user_id) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-5-d069ad2e] _
+tests/req001/test_workspace_provisioning.py:67: in test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard
+    assert derive_workspace_username(user_id) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-36-e81ec5bc] _
+tests/req001/test_workspace_provisioning.py:67: in test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard
+    assert derive_workspace_username(user_id) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-11-f897eedc] _
+tests/req001/test_workspace_provisioning.py:67: in test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard
+    assert derive_workspace_username(user_id) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_complete_case_sensitive_identity_controls_mapping[abcdefgh-one-abcdefgh-two] _
+tests/req001/test_workspace_provisioning.py:81: in test_complete_case_sensitive_identity_controls_mapping
+    assert derive_workspace_username(first) != derive_workspace_username(second)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+______ test_complete_case_sensitive_identity_controls_mapping[ab.cd-abcd] ______
+tests/req001/test_workspace_provisioning.py:81: in test_complete_case_sensitive_identity_controls_mapping
+    assert derive_workspace_username(first) != derive_workspace_username(second)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_____ test_complete_case_sensitive_identity_controls_mapping[Alice-alice] ______
+tests/req001/test_workspace_provisioning.py:81: in test_complete_case_sensitive_identity_controls_mapping
+    assert derive_workspace_username(first) != derive_workspace_username(second)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_________ test_complete_case_sensitive_identity_controls_mapping[a-b] __________
+tests/req001/test_workspace_provisioning.py:81: in test_complete_case_sensitive_identity_controls_mapping
+    assert derive_workspace_username(first) != derive_workspace_username(second)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_prefix_is_applied_before_checking_final_leading_character[alice--u2bd806c9] _
+tests/req001/test_workspace_provisioning.py:98: in test_prefix_is_applied_before_checking_final_leading_character
+    name = derive_workspace_username(user_id, prefix=prefix)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_prefix_is_applied_before_checking_final_leading_character[alice-r2_-r2_2bd806c9] _
+tests/req001/test_workspace_provisioning.py:98: in test_prefix_is_applied_before_checking_final_leading_character
+    name = derive_workspace_username(user_id, prefix=prefix)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_prefix_is_applied_before_checking_final_leading_character[alice-_-_2bd806c9] _
+tests/req001/test_workspace_provisioning.py:98: in test_prefix_is_applied_before_checking_final_leading_character
+    name = derive_workspace_username(user_id, prefix=prefix)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_prefix_is_applied_before_checking_final_leading_character[alice-abcdefg-abcdefg2bd806c9] _
+tests/req001/test_workspace_provisioning.py:98: in test_prefix_is_applied_before_checking_final_leading_character
+    name = derive_workspace_username(user_id, prefix=prefix)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_prefix_is_applied_before_checking_final_leading_character[a--ca978112] __
+tests/req001/test_workspace_provisioning.py:98: in test_prefix_is_applied_before_checking_final_leading_character
+    name = derive_workspace_username(user_id, prefix=prefix)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_prefix_is_applied_before_checking_final_leading_character[a-r2_-r2_ca978112] _
+tests/req001/test_workspace_provisioning.py:98: in test_prefix_is_applied_before_checking_final_leading_character
+    name = derive_workspace_username(user_id, prefix=prefix)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_prefix_is_applied_before_checking_final_leading_character[a-_-_ca978112] _
+tests/req001/test_workspace_provisioning.py:98: in test_prefix_is_applied_before_checking_final_leading_character
+    name = derive_workspace_username(user_id, prefix=prefix)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_prefix_is_applied_before_checking_final_leading_character[a-abcdefg-abcdefgca978112] _
+tests/req001/test_workspace_provisioning.py:98: in test_prefix_is_applied_before_checking_final_leading_character
+    name = derive_workspace_username(user_id, prefix=prefix)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+__________________ test_invalid_prefix_is_rejected[abcdefgh] ___________________
+tests/req001/test_workspace_provisioning.py:106: in test_invalid_prefix_is_rejected
+    derive_workspace_username("prefix-example", prefix=prefix)
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+____________________ test_invalid_prefix_is_rejected[UPPER] ____________________
+tests/req001/test_workspace_provisioning.py:106: in test_invalid_prefix_is_rejected
+    derive_workspace_username("prefix-example", prefix=prefix)
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+____________________ test_invalid_prefix_is_rejected[1bad] _____________________
+tests/req001/test_workspace_provisioning.py:106: in test_invalid_prefix_is_rejected
+    derive_workspace_username("prefix-example", prefix=prefix)
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_____________________ test_invalid_prefix_is_rejected[a-b] _____________________
+tests/req001/test_workspace_provisioning.py:106: in test_invalid_prefix_is_rejected
+    derive_workspace_username("prefix-example", prefix=prefix)
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_____________________ test_invalid_prefix_is_rejected[../] _____________________
+tests/req001/test_workspace_provisioning.py:106: in test_invalid_prefix_is_rejected
+    derive_workspace_username("prefix-example", prefix=prefix)
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_____________________ test_invalid_prefix_is_rejected[ x] ______________________
+tests/req001/test_workspace_provisioning.py:106: in test_invalid_prefix_is_rejected
+    derive_workspace_username("prefix-example", prefix=prefix)
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+___________________ test_invalid_prefix_is_rejected[\u4e2d] ____________________
+tests/req001/test_workspace_provisioning.py:106: in test_invalid_prefix_is_rejected
+    derive_workspace_username("prefix-example", prefix=prefix)
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+______ test_known_distinct_ids_share_an_eight_digit_candidate[-u19042bfe] ______
+tests/req001/test_workspace_provisioning.py:112: in test_known_distinct_ids_share_an_eight_digit_candidate
+    assert derive_workspace_username("req001-collision-49585", prefix=prefix) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+___ test_known_distinct_ids_share_an_eight_digit_candidate[r2_-r2_19042bfe] ____
+tests/req001/test_workspace_provisioning.py:112: in test_known_distinct_ids_share_an_eight_digit_candidate
+    assert derive_workspace_username("req001-collision-49585", prefix=prefix) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_random_candidate_uses_four_entropy_bytes_and_final_leading_guard[0123abcd--u0123abcd] _
+tests/req001/test_workspace_provisioning.py:133: in test_random_candidate_uses_four_entropy_bytes_and_final_leading_guard
+    assert generate_workspace_username(prefix=prefix) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:84: in generate_workspace_username
+    raise NotImplementedError("REQ-001: implement short random username candidate")
+E   NotImplementedError: REQ-001: implement short random username candidate
+_ test_random_candidate_uses_four_entropy_bytes_and_final_leading_guard[abcdef01--abcdef01] _
+tests/req001/test_workspace_provisioning.py:133: in test_random_candidate_uses_four_entropy_bytes_and_final_leading_guard
+    assert generate_workspace_username(prefix=prefix) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:84: in generate_workspace_username
+    raise NotImplementedError("REQ-001: implement short random username candidate")
+E   NotImplementedError: REQ-001: implement short random username candidate
+_ test_random_candidate_uses_four_entropy_bytes_and_final_leading_guard[0123abcd-r2_-r2_0123abcd] _
+tests/req001/test_workspace_provisioning.py:133: in test_random_candidate_uses_four_entropy_bytes_and_final_leading_guard
+    assert generate_workspace_username(prefix=prefix) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:84: in generate_workspace_username
+    raise NotImplementedError("REQ-001: implement short random username candidate")
+E   NotImplementedError: REQ-001: implement short random username candidate
+_ test_random_candidate_uses_four_entropy_bytes_and_final_leading_guard[abcdef01-abcdefg-abcdefgabcdef01] _
+tests/req001/test_workspace_provisioning.py:133: in test_random_candidate_uses_four_entropy_bytes_and_final_leading_guard
+    assert generate_workspace_username(prefix=prefix) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:84: in generate_workspace_username
+    raise NotImplementedError("REQ-001: implement short random username candidate")
+E   NotImplementedError: REQ-001: implement short random username candidate
+_ test_allocation_uses_independent_inclusive_pools[used_uids0-used_gids0-expected0] _
+tests/req001/test_workspace_provisioning.py:150: in test_allocation_uses_independent_inclusive_pools
+    assert allocate_workspace_ids(used_uids, used_gids) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:104: in allocate_workspace_ids
+    raise NotImplementedError("REQ-001: implement bounded independent ID allocation")
+E   NotImplementedError: REQ-001: implement bounded independent ID allocation
+_ test_allocation_uses_independent_inclusive_pools[used_uids1-used_gids1-expected1] _
+tests/req001/test_workspace_provisioning.py:150: in test_allocation_uses_independent_inclusive_pools
+    assert allocate_workspace_ids(used_uids, used_gids) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:104: in allocate_workspace_ids
+    raise NotImplementedError("REQ-001: implement bounded independent ID allocation")
+E   NotImplementedError: REQ-001: implement bounded independent ID allocation
+_ test_allocation_uses_independent_inclusive_pools[used_uids2-used_gids2-expected2] _
+tests/req001/test_workspace_provisioning.py:150: in test_allocation_uses_independent_inclusive_pools
+    assert allocate_workspace_ids(used_uids, used_gids) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:104: in allocate_workspace_ids
+    raise NotImplementedError("REQ-001: implement bounded independent ID allocation")
+E   NotImplementedError: REQ-001: implement bounded independent ID allocation
+_ test_allocation_uses_independent_inclusive_pools[used_uids3-used_gids3-expected3] _
+tests/req001/test_workspace_provisioning.py:150: in test_allocation_uses_independent_inclusive_pools
+    assert allocate_workspace_ids(used_uids, used_gids) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:104: in allocate_workspace_ids
+    raise NotImplementedError("REQ-001: implement bounded independent ID allocation")
+E   NotImplementedError: REQ-001: implement bounded independent ID allocation
+_ test_allocation_uses_independent_inclusive_pools[used_uids4-used_gids4-expected4] _
+tests/req001/test_workspace_provisioning.py:150: in test_allocation_uses_independent_inclusive_pools
+    assert allocate_workspace_ids(used_uids, used_gids) == expected
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:104: in allocate_workspace_ids
+    raise NotImplementedError("REQ-001: implement bounded independent ID allocation")
+E   NotImplementedError: REQ-001: implement bounded independent ID allocation
+_ test_pool_exhaustion_is_explicit_and_does_not_change_inputs[used_uids0-used_gids0-uid_pool_exhausted] _
+tests/req001/test_workspace_provisioning.py:166: in test_pool_exhaustion_is_explicit_and_does_not_change_inputs
+    allocate_workspace_ids(used_uids, used_gids)
+open_terminal/utils/user_isolation.py:104: in allocate_workspace_ids
+    raise NotImplementedError("REQ-001: implement bounded independent ID allocation")
+E   NotImplementedError: REQ-001: implement bounded independent ID allocation
+_ test_pool_exhaustion_is_explicit_and_does_not_change_inputs[used_uids1-used_gids1-gid_pool_exhausted] _
+tests/req001/test_workspace_provisioning.py:166: in test_pool_exhaustion_is_explicit_and_does_not_change_inputs
+    allocate_workspace_ids(used_uids, used_gids)
+open_terminal/utils/user_isolation.py:104: in allocate_workspace_ids
+    raise NotImplementedError("REQ-001: implement bounded independent ID allocation")
+E   NotImplementedError: REQ-001: implement bounded independent ID allocation
+_ test_pool_exhaustion_is_explicit_and_does_not_change_inputs[used_uids2-used_gids2-uid_pool_exhausted] _
+tests/req001/test_workspace_provisioning.py:166: in test_pool_exhaustion_is_explicit_and_does_not_change_inputs
+    allocate_workspace_ids(used_uids, used_gids)
+open_terminal/utils/user_isolation.py:104: in allocate_workspace_ids
+    raise NotImplementedError("REQ-001: implement bounded independent ID allocation")
+E   NotImplementedError: REQ-001: implement bounded independent ID allocation
+_______________ test_two_users_receive_distinct_ready_workspaces _______________
+tests/req001/test_workspace_provisioning.py:212: in test_two_users_receive_distinct_ready_workspaces
+    first = provisioner.resolve(identity + "-A")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:198: in resolve
+    raise NotImplementedError("REQ-001: implement ownership-aware workspace preparation")
+E   NotImplementedError: REQ-001: implement ownership-aware workspace preparation
+________ test_repeated_access_and_new_provisioner_preserve_home_and_ids ________
+tests/req001/test_workspace_provisioning.py:228: in test_repeated_access_and_new_provisioner_preserve_home_and_ids
+    first = provisioner.resolve(identity)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:198: in resolve
+    raise NotImplementedError("REQ-001: implement ownership-aware workspace preparation")
+E   NotImplementedError: REQ-001: implement ownership-aware workspace preparation
+_ test_concurrent_first_access_has_no_duplicate_or_shared_identity[same-user] __
+tests/req001/test_workspace_provisioning.py:250: in test_concurrent_first_access_has_no_duplicate_or_shared_identity
+    accounts = list(executor.map(prepare, identities))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:619: in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:317: in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:449: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/usr/local/lib/python3.12/concurrent/futures/thread.py:59: in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/req001/test_workspace_provisioning.py:247: in prepare
+    return resolver.resolve(user_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:198: in resolve
+    raise NotImplementedError("REQ-001: implement ownership-aware workspace preparation")
+E   NotImplementedError: REQ-001: implement ownership-aware workspace preparation
+_ test_concurrent_first_access_has_no_duplicate_or_shared_identity[different-users] _
+tests/req001/test_workspace_provisioning.py:250: in test_concurrent_first_access_has_no_duplicate_or_shared_identity
+    accounts = list(executor.map(prepare, identities))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:619: in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:317: in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/usr/local/lib/python3.12/concurrent/futures/thread.py:59: in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/req001/test_workspace_provisioning.py:247: in prepare
+    return resolver.resolve(user_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:198: in resolve
+    raise NotImplementedError("REQ-001: implement ownership-aware workspace preparation")
+E   NotImplementedError: REQ-001: implement ownership-aware workspace preparation
+_____ test_unowned_existing_resource_is_skipped_without_adoption[account] ______
+tests/req001/test_workspace_provisioning.py:266: in test_unowned_existing_resource_is_skipped_without_adoption
+    name = derive_workspace_username(identity, prefix=options["username_prefix"])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+______ test_unowned_existing_resource_is_skipped_without_adoption[group] _______
+tests/req001/test_workspace_provisioning.py:266: in test_unowned_existing_resource_is_skipped_without_adoption
+    name = derive_workspace_username(identity, prefix=options["username_prefix"])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_______ test_unowned_existing_resource_is_skipped_without_adoption[home] _______
+tests/req001/test_workspace_provisioning.py:266: in test_unowned_existing_resource_is_skipped_without_adoption
+    name = derive_workspace_username(identity, prefix=options["username_prefix"])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_______ test_retry_after_permission_step_failure_reuses_original_account _______
+tests/req001/test_workspace_provisioning.py:299: in test_retry_after_permission_step_failure_reuses_original_account
+    name = derive_workspace_username(identity, prefix=options["username_prefix"])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+________ test_resolver_skips_real_independent_uid_and_gid_reservations _________
+tests/req001/test_workspace_provisioning.py:357: in test_resolver_skips_real_independent_uid_and_gid_reservations
+    account = provisioner.resolve(identity)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:198: in resolve
+    raise NotImplementedError("REQ-001: implement ownership-aware workspace preparation")
+E   NotImplementedError: REQ-001: implement ownership-aware workspace preparation
+___ test_resolver_exhaustion_from_nss_snapshot_creates_no_os_resources[uid] ____
+tests/req001/test_workspace_provisioning.py:407: in test_resolver_exhaustion_from_nss_snapshot_creates_no_os_resources
+    provisioner.resolve(identity)
+open_terminal/utils/user_isolation.py:198: in resolve
+    raise NotImplementedError("REQ-001: implement ownership-aware workspace preparation")
+E   NotImplementedError: REQ-001: implement ownership-aware workspace preparation
+___ test_resolver_exhaustion_from_nss_snapshot_creates_no_os_resources[gid] ____
+tests/req001/test_workspace_provisioning.py:407: in test_resolver_exhaustion_from_nss_snapshot_creates_no_os_resources
+    provisioner.resolve(identity)
+open_terminal/utils/user_isolation.py:198: in resolve
+    raise NotImplementedError("REQ-001: implement ownership-aware workspace preparation")
+E   NotImplementedError: REQ-001: implement ownership-aware workspace preparation
+_ test_invalid_persistent_state_fails_without_repairing_or_adopting_data[bad-json] _
+tests/req001/test_workspace_recovery.py:69: in test_invalid_persistent_state_fails_without_repairing_or_adopting_data
+    provisioner.resolve(identity)
+open_terminal/utils/user_isolation.py:198: in resolve
+    raise NotImplementedError("REQ-001: implement ownership-aware workspace preparation")
+E   NotImplementedError: REQ-001: implement ownership-aware workspace preparation
+_ test_invalid_persistent_state_fails_without_repairing_or_adopting_data[unknown-version] _
+tests/req001/test_workspace_recovery.py:69: in test_invalid_persistent_state_fails_without_repairing_or_adopting_data
+    provisioner.resolve(identity)
+open_terminal/utils/user_isolation.py:198: in resolve
+    raise NotImplementedError("REQ-001: implement ownership-aware workspace preparation")
+E   NotImplementedError: REQ-001: implement ownership-aware workspace preparation
+__ test_another_complete_id_reserving_candidate_name_is_preserved_and_skipped __
+tests/req001/test_workspace_recovery.py:80: in test_another_complete_id_reserving_candidate_name_is_preserved_and_skipped
+    reserved = binding(options, identity, state="planned")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/req001/test_workspace_recovery.py:47: in binding
+    name = derive_workspace_username(identity, prefix=options["username_prefix"])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_real_eight_digit_collision_persists_distinct_names_across_retry_and_recreation _
+tests/req001/test_workspace_recovery.py:103: in test_real_eight_digit_collision_persists_distinct_names_across_retry_and_recreation
+    first = provisioner.resolve(first_id)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:198: in resolve
+    raise NotImplementedError("REQ-001: implement ownership-aware workspace preparation")
+E   NotImplementedError: REQ-001: implement ownership-aware workspace preparation
+_ test_random_retry_checks_registry_account_group_home_and_repeated_candidates[-candidates0-u5abcde90] _
+tests/req001/test_workspace_recovery.py:170: in test_random_retry_checks_registry_account_group_home_and_repeated_candidates
+    preferred = home_root / derive_workspace_username(identity, prefix=prefix)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_ test_random_retry_checks_registry_account_group_home_and_repeated_candidates[rng_-candidates1-rng_5abcde90] _
+tests/req001/test_workspace_recovery.py:170: in test_random_retry_checks_registry_account_group_home_and_repeated_candidates
+    preferred = home_root / derive_workspace_username(identity, prefix=prefix)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_______ test_32_occupied_random_candidates_fail_without_partial_binding ________
+tests/req001/test_workspace_recovery.py:219: in test_32_occupied_random_candidates_fail_without_partial_binding
+    preferred = home_root / derive_workspace_username(identity, prefix="ex_")
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+______ test_random_name_permission_failure_retries_the_persisted_binding _______
+tests/req001/test_workspace_recovery.py:251: in test_random_name_permission_failure_retries_the_persisted_binding
+    preferred = Path(options["home_root"]) / derive_workspace_username(identity, prefix="rr_")
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+______ test_verified_existing_out_of_range_account_keeps_its_numeric_ids _______
+tests/req001/test_workspace_recovery.py:307: in test_verified_existing_out_of_range_account_keeps_its_numeric_ids
+    record = binding(options, identity, uid=free_uid(25001), gid=free_gid(26001))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/req001/test_workspace_recovery.py:47: in binding
+    name = derive_workspace_username(identity, prefix=options["username_prefix"])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+_____ test_absent_os_account_is_recreated_from_retained_registry_and_home ______
+tests/req001/test_workspace_recovery.py:329: in test_absent_os_account_is_recreated_from_retained_registry_and_home
+    original = provisioner.resolve(identity)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:198: in resolve
+    raise NotImplementedError("REQ-001: implement ownership-aware workspace preparation")
+E   NotImplementedError: REQ-001: implement ownership-aware workspace preparation
+____ test_reserved_private_group_can_be_resumed_after_interruption[planned] ____
+tests/req001/test_workspace_recovery.py:352: in test_reserved_private_group_can_be_resumed_after_interruption
+    record = binding(options, identity, state=state)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/req001/test_workspace_recovery.py:47: in binding
+    name = derive_workspace_username(identity, prefix=options["username_prefix"])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+__ test_reserved_private_group_can_be_resumed_after_interruption[group_ready] __
+tests/req001/test_workspace_recovery.py:352: in test_reserved_private_group_can_be_resumed_after_interruption
+    record = binding(options, identity, state=state)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/req001/test_workspace_recovery.py:47: in binding
+    name = derive_workspace_username(identity, prefix=options["username_prefix"])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+______________ test_symbolic_link_home_is_not_adopted_or_repaired ______________
+tests/req001/test_workspace_recovery.py:364: in test_symbolic_link_home_is_not_adopted_or_repaired
+    record = binding(options, identity, state="planned")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/req001/test_workspace_recovery.py:47: in binding
+    name = derive_workspace_username(identity, prefix=options["username_prefix"])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+open_terminal/utils/user_isolation.py:60: in derive_workspace_username
+    raise NotImplementedError("REQ-001: implement full-ID username derivation")
+E   NotImplementedError: REQ-001: implement full-ID username derivation
+____ test_processes_share_one_consistent_initialization_journal[same-user] _____
+concurrent.futures.process._RemoteTraceback:
+"""
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/concurrent/futures/process.py", line 264, in _process_worker
+    r = call_item.fn(*call_item.args, **call_item.kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/req001/tests/req001/test_workspace_recovery.py", line 388, in resolve_in_child
+    return resolver.resolve(identity)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/req001/open_terminal/utils/user_isolation.py", line 198, in resolve
+    raise NotImplementedError("REQ-001: implement ownership-aware workspace preparation")
+NotImplementedError: REQ-001: implement ownership-aware workspace preparation
+"""
+
+The above exception was the direct cause of the following exception:
+tests/req001/test_workspace_recovery.py:408: in test_processes_share_one_consistent_initialization_journal
+    accounts = [future.result(timeout=max(0.1, deadline - time.monotonic())) for future in futures]
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+E   NotImplementedError: REQ-001: implement ownership-aware workspace preparation
+_ test_processes_share_one_consistent_initialization_journal[different-users] __
+concurrent.futures.process._RemoteTraceback:
+"""
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/concurrent/futures/process.py", line 264, in _process_worker
+    r = call_item.fn(*call_item.args, **call_item.kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/req001/tests/req001/test_workspace_recovery.py", line 388, in resolve_in_child
+    return resolver.resolve(identity)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/req001/open_terminal/utils/user_isolation.py", line 198, in resolve
+    raise NotImplementedError("REQ-001: implement ownership-aware workspace preparation")
+NotImplementedError: REQ-001: implement ownership-aware workspace preparation
+"""
+
+The above exception was the direct cause of the following exception:
+tests/req001/test_workspace_recovery.py:408: in test_processes_share_one_consistent_initialization_journal
+    accounts = [future.result(timeout=max(0.1, deadline - time.monotonic())) for future in futures]
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+E   NotImplementedError: REQ-001: implement ownership-aware workspace preparation
+_ test_processes_share_one_consistent_initialization_journal[colliding-users] __
+concurrent.futures.process._RemoteTraceback:
+"""
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/concurrent/futures/process.py", line 264, in _process_worker
+    r = call_item.fn(*call_item.args, **call_item.kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/req001/tests/req001/test_workspace_recovery.py", line 388, in resolve_in_child
+    return resolver.resolve(identity)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/req001/open_terminal/utils/user_isolation.py", line 198, in resolve
+    raise NotImplementedError("REQ-001: implement ownership-aware workspace preparation")
+NotImplementedError: REQ-001: implement ownership-aware workspace preparation
+"""
+
+The above exception was the direct cause of the following exception:
+tests/req001/test_workspace_recovery.py:408: in test_processes_share_one_consistent_initialization_journal
+    accounts = [future.result(timeout=max(0.1, deadline - time.monotonic())) for future in futures]
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+E   NotImplementedError: REQ-001: implement ownership-aware workspace preparation
+=============================== warnings summary ===============================
+../../usr/local/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /usr/local/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/req001/test_identity_dependency.py::test_identity_dependency_preserves_the_exact_header[a]
+FAILED tests/req001/test_identity_dependency.py::test_identity_dependency_preserves_the_exact_header[root]
+FAILED tests/req001/test_identity_dependency.py::test_identity_dependency_preserves_the_exact_header[Alice]
+FAILED tests/req001/test_identity_dependency.py::test_identity_dependency_preserves_the_exact_header[alice]
+FAILED tests/req001/test_identity_dependency.py::test_identity_dependency_preserves_the_exact_header[a.b:c@d-_]
+FAILED tests/req001/test_identity_dependency.py::test_identity_dependency_preserves_the_exact_header[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]
+FAILED tests/req001/test_identity_dependency.py::test_identity_dependency_rejects_missing_invalid_or_repeated_headers[headers0]
+FAILED tests/req001/test_identity_dependency.py::test_identity_dependency_rejects_missing_invalid_or_repeated_headers[headers1]
+FAILED tests/req001/test_identity_dependency.py::test_identity_dependency_rejects_missing_invalid_or_repeated_headers[headers2]
+FAILED tests/req001/test_identity_dependency.py::test_identity_dependency_rejects_missing_invalid_or_repeated_headers[headers3]
+FAILED tests/req001/test_identity_dependency.py::test_identity_dependency_rejects_missing_invalid_or_repeated_headers[headers4]
+FAILED tests/req001/test_identity_dependency.py::test_identity_dependency_rejects_missing_invalid_or_repeated_headers[headers5]
+FAILED tests/req001/test_identity_dependency.py::test_identity_dependency_rejects_missing_invalid_or_repeated_headers[headers6]
+FAILED tests/req001/test_identity_dependency.py::test_identity_dependency_accepts_a_websocket_connection_after_service_auth
+FAILED tests/req001/test_identity_dependency.py::test_explicit_single_user_mode_needs_no_identity_or_linux_provisioning[headers0]
+FAILED tests/req001/test_identity_dependency.py::test_explicit_single_user_mode_needs_no_identity_or_linux_provisioning[headers1]
+FAILED tests/req001/test_identity_dependency.py::test_explicit_single_user_mode_needs_no_identity_or_linux_provisioning[headers2]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[cwd-read]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[cwd-write]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[skills-list]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[skills-read]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[files-list]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[files-compare]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[files-read]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[files-display]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[files-view]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[files-serve]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[files-write]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[files-mkdir]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[files-delete]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[files-move]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[files-replace]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[files-grep]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[files-matches]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[files-search]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[files-glob]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[files-upload]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[files-archive]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[processes-list]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[process-create]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[process-status]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[process-input]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[process-delete]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[ports-list]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[port-proxy-get]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[port-proxy-post]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[port-proxy-put]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[port-proxy-patch]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[port-proxy-delete]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[port-proxy-head]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[port-proxy-options]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[terminal-create]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[terminals-list]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[terminal-get]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[terminal-delete]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[terminal-user-output]
+FAILED tests/req001/test_identity_http.py::test_every_resource_route_rejects_missing_identity[terminal-user-input]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[-/files/cwd]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[-/execute]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[-/ports]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[-/api/terminals]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[ -/files/cwd]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[ -/execute]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[ -/ports]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[ -/api/terminals]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[ alice-/files/cwd]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[ alice-/execute]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[ alice-/ports]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[ alice-/api/terminals]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[alice -/files/cwd]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[alice -/execute]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[alice -/ports]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[alice -/api/terminals]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[alice/bob-/files/cwd]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[alice/bob-/execute]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[alice/bob-/ports]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[alice/bob-/api/terminals]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-/files/cwd]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-/execute]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-/ports]
+FAILED tests/req001/test_identity_http.py::test_resource_families_reject_invalid_identity_without_provisioning[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-/api/terminals]
+FAILED tests/req001/test_identity_http.py::test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value[alice-/files/cwd]
+FAILED tests/req001/test_identity_http.py::test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value[alice-/execute]
+FAILED tests/req001/test_identity_http.py::test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value[alice-/ports]
+FAILED tests/req001/test_identity_http.py::test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value[alice-/api/terminals]
+FAILED tests/req001/test_identity_http.py::test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value[bob-/files/cwd]
+FAILED tests/req001/test_identity_http.py::test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value[bob-/execute]
+FAILED tests/req001/test_identity_http.py::test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value[bob-/ports]
+FAILED tests/req001/test_identity_http.py::test_duplicate_identity_headers_are_not_resolved_by_first_or_last_value[bob-/api/terminals]
+FAILED tests/req001/test_identity_http.py::test_provisioning_errors_remain_diagnostic_without_leaking_details[/files/cwd-uid_pool_exhausted-503]
+FAILED tests/req001/test_identity_http.py::test_provisioning_errors_remain_diagnostic_without_leaking_details[/files/cwd-gid_pool_exhausted-503]
+FAILED tests/req001/test_identity_http.py::test_provisioning_errors_remain_diagnostic_without_leaking_details[/files/cwd-username_allocation_failed-503]
+FAILED tests/req001/test_identity_http.py::test_provisioning_errors_remain_diagnostic_without_leaking_details[/files/cwd-workspace_busy-503]
+FAILED tests/req001/test_identity_http.py::test_provisioning_errors_remain_diagnostic_without_leaking_details[/files/cwd-workspace_unavailable-503]
+FAILED tests/req001/test_identity_http.py::test_provisioning_errors_remain_diagnostic_without_leaking_details[/files/cwd-identity_conflict-409]
+FAILED tests/req001/test_identity_http.py::test_provisioning_errors_remain_diagnostic_without_leaking_details[/files/cwd-workspace_state_invalid-500]
+FAILED tests/req001/test_identity_http.py::test_provisioning_errors_remain_diagnostic_without_leaking_details[/files/cwd-workspace_config_invalid-500]
+FAILED tests/req001/test_identity_http.py::test_provisioning_errors_remain_diagnostic_without_leaking_details[/ports-uid_pool_exhausted-503]
+FAILED tests/req001/test_identity_http.py::test_provisioning_errors_remain_diagnostic_without_leaking_details[/ports-username_allocation_failed-503]
+FAILED tests/req001/test_identity_http.py::test_provisioning_errors_remain_diagnostic_without_leaking_details[/ports-identity_conflict-409]
+FAILED tests/req001/test_identity_http.py::test_provisioning_errors_remain_diagnostic_without_leaking_details[/proxy/18080/-gid_pool_exhausted-503]
+FAILED tests/req001/test_identity_http.py::test_provisioning_errors_remain_diagnostic_without_leaking_details[/proxy/18080/-workspace_state_invalid-500]
+FAILED tests/req001/test_identity_http.py::test_websocket_authentication_precedes_lookup_of_a_missing_terminal[payload0]
+FAILED tests/req001/test_identity_http.py::test_websocket_authentication_precedes_lookup_of_a_missing_terminal[payload1]
+FAILED tests/req001/test_identity_http.py::test_websocket_authentication_precedes_lookup_of_a_missing_terminal[payload2]
+FAILED tests/req001/test_identity_http.py::test_websocket_authentication_precedes_lookup_of_a_missing_terminal[payload3]
+FAILED tests/req001/test_identity_http.py::test_websocket_identity_is_checked_after_key_before_resource_lookup[None]
+FAILED tests/req001/test_identity_http.py::test_websocket_identity_is_checked_after_key_before_resource_lookup[]
+FAILED tests/req001/test_identity_http.py::test_websocket_identity_is_checked_after_key_before_resource_lookup[ ]
+FAILED tests/req001/test_identity_http.py::test_websocket_identity_is_checked_after_key_before_resource_lookup[alice/bob]
+FAILED tests/req001/test_identity_http.py::test_websocket_identity_is_checked_after_key_before_resource_lookup[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]
+FAILED tests/req001/test_identity_http.py::test_websocket_rejects_duplicate_identity_headers
+FAILED tests/req001/test_identity_values.py::test_supported_identity_is_returned_verbatim[a]
+FAILED tests/req001/test_identity_values.py::test_supported_identity_is_returned_verbatim[0]
+FAILED tests/req001/test_identity_values.py::test_supported_identity_is_returned_verbatim[root]
+FAILED tests/req001/test_identity_values.py::test_supported_identity_is_returned_verbatim[service]
+FAILED tests/req001/test_identity_values.py::test_supported_identity_is_returned_verbatim[ABCD]
+FAILED tests/req001/test_identity_values.py::test_supported_identity_is_returned_verbatim[abcd]
+FAILED tests/req001/test_identity_values.py::test_supported_identity_is_returned_verbatim[12345678-abcd-4321-abcd-123456789abc]
+FAILED tests/req001/test_identity_values.py::test_supported_identity_is_returned_verbatim[a.b:c@d-_]
+FAILED tests/req001/test_identity_values.py::test_supported_identity_is_returned_verbatim[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]
+FAILED tests/req001/test_identity_values.py::test_case_distinct_ids_remain_distinct
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[None]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[ ]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[ alice]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[alice ]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[alice bob]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[\talice]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[alice\n]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[alice\r\nBob]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[alice\x00]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[alice\x7f]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[\u7528\u6237]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[caf\xe9]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[a\u200bb]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[../alice]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[alice/bob]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[alice\\bob]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[alice,bob]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[-alice]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[_alice]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[.alice]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[:alice]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[@alice]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[1]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[False]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[alice]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[value27]
+FAILED tests/req001/test_identity_values.py::test_unsupported_identity_has_a_domain_error[value28]
+FAILED tests/req001/test_workspace_provisioning.py::test_username_is_stable_bounded_and_not_an_input_account[a]
+FAILED tests/req001/test_workspace_provisioning.py::test_username_is_stable_bounded_and_not_an_input_account[root]
+FAILED tests/req001/test_workspace_provisioning.py::test_username_is_stable_bounded_and_not_an_input_account[user]
+FAILED tests/req001/test_workspace_provisioning.py::test_username_is_stable_bounded_and_not_an_input_account[Alice]
+FAILED tests/req001/test_workspace_provisioning.py::test_username_is_stable_bounded_and_not_an_input_account[A.b:c@d-_]
+FAILED tests/req001/test_workspace_provisioning.py::test_username_is_stable_bounded_and_not_an_input_account[99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999]
+FAILED tests/req001/test_workspace_provisioning.py::test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[a-ca978112]
+FAILED tests/req001/test_workspace_provisioning.py::test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[abc-ba7816bf]
+FAILED tests/req001/test_workspace_provisioning.py::test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[alice-u2bd806c9]
+FAILED tests/req001/test_workspace_provisioning.py::test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-1-u0899cd85]
+FAILED tests/req001/test_workspace_provisioning.py::test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-9-u1a9f9193]
+FAILED tests/req001/test_workspace_provisioning.py::test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-2-u2be9fec9]
+FAILED tests/req001/test_workspace_provisioning.py::test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-12-u3a7d1f95]
+FAILED tests/req001/test_workspace_provisioning.py::test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-35-u45ea2d13]
+FAILED tests/req001/test_workspace_provisioning.py::test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-24-u595b6ec3]
+FAILED tests/req001/test_workspace_provisioning.py::test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-4-u6e16930f]
+FAILED tests/req001/test_workspace_provisioning.py::test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-3-u73014671]
+FAILED tests/req001/test_workspace_provisioning.py::test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-23-u839c3dfb]
+FAILED tests/req001/test_workspace_provisioning.py::test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-22-u964e7ddb]
+FAILED tests/req001/test_workspace_provisioning.py::test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-0-a5bb10eb]
+FAILED tests/req001/test_workspace_provisioning.py::test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-8-b1b7dd7a]
+FAILED tests/req001/test_workspace_provisioning.py::test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-33-ca1eed8e]
+FAILED tests/req001/test_workspace_provisioning.py::test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-5-d069ad2e]
+FAILED tests/req001/test_workspace_provisioning.py::test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-36-e81ec5bc]
+FAILED tests/req001/test_workspace_provisioning.py::test_fixed_eight_digit_hash_examples_apply_numeric_leading_guard[sample-11-f897eedc]
+FAILED tests/req001/test_workspace_provisioning.py::test_complete_case_sensitive_identity_controls_mapping[abcdefgh-one-abcdefgh-two]
+FAILED tests/req001/test_workspace_provisioning.py::test_complete_case_sensitive_identity_controls_mapping[ab.cd-abcd]
+FAILED tests/req001/test_workspace_provisioning.py::test_complete_case_sensitive_identity_controls_mapping[Alice-alice]
+FAILED tests/req001/test_workspace_provisioning.py::test_complete_case_sensitive_identity_controls_mapping[a-b]
+FAILED tests/req001/test_workspace_provisioning.py::test_prefix_is_applied_before_checking_final_leading_character[alice--u2bd806c9]
+FAILED tests/req001/test_workspace_provisioning.py::test_prefix_is_applied_before_checking_final_leading_character[alice-r2_-r2_2bd806c9]
+FAILED tests/req001/test_workspace_provisioning.py::test_prefix_is_applied_before_checking_final_leading_character[alice-_-_2bd806c9]
+FAILED tests/req001/test_workspace_provisioning.py::test_prefix_is_applied_before_checking_final_leading_character[alice-abcdefg-abcdefg2bd806c9]
+FAILED tests/req001/test_workspace_provisioning.py::test_prefix_is_applied_before_checking_final_leading_character[a--ca978112]
+FAILED tests/req001/test_workspace_provisioning.py::test_prefix_is_applied_before_checking_final_leading_character[a-r2_-r2_ca978112]
+FAILED tests/req001/test_workspace_provisioning.py::test_prefix_is_applied_before_checking_final_leading_character[a-_-_ca978112]
+FAILED tests/req001/test_workspace_provisioning.py::test_prefix_is_applied_before_checking_final_leading_character[a-abcdefg-abcdefgca978112]
+FAILED tests/req001/test_workspace_provisioning.py::test_invalid_prefix_is_rejected[abcdefgh]
+FAILED tests/req001/test_workspace_provisioning.py::test_invalid_prefix_is_rejected[UPPER]
+FAILED tests/req001/test_workspace_provisioning.py::test_invalid_prefix_is_rejected[1bad]
+FAILED tests/req001/test_workspace_provisioning.py::test_invalid_prefix_is_rejected[a-b]
+FAILED tests/req001/test_workspace_provisioning.py::test_invalid_prefix_is_rejected[../]
+FAILED tests/req001/test_workspace_provisioning.py::test_invalid_prefix_is_rejected[ x]
+FAILED tests/req001/test_workspace_provisioning.py::test_invalid_prefix_is_rejected[\u4e2d]
+FAILED tests/req001/test_workspace_provisioning.py::test_known_distinct_ids_share_an_eight_digit_candidate[-u19042bfe]
+FAILED tests/req001/test_workspace_provisioning.py::test_known_distinct_ids_share_an_eight_digit_candidate[r2_-r2_19042bfe]
+FAILED tests/req001/test_workspace_provisioning.py::test_random_candidate_uses_four_entropy_bytes_and_final_leading_guard[0123abcd--u0123abcd]
+FAILED tests/req001/test_workspace_provisioning.py::test_random_candidate_uses_four_entropy_bytes_and_final_leading_guard[abcdef01--abcdef01]
+FAILED tests/req001/test_workspace_provisioning.py::test_random_candidate_uses_four_entropy_bytes_and_final_leading_guard[0123abcd-r2_-r2_0123abcd]
+FAILED tests/req001/test_workspace_provisioning.py::test_random_candidate_uses_four_entropy_bytes_and_final_leading_guard[abcdef01-abcdefg-abcdefgabcdef01]
+FAILED tests/req001/test_workspace_provisioning.py::test_allocation_uses_independent_inclusive_pools[used_uids0-used_gids0-expected0]
+FAILED tests/req001/test_workspace_provisioning.py::test_allocation_uses_independent_inclusive_pools[used_uids1-used_gids1-expected1]
+FAILED tests/req001/test_workspace_provisioning.py::test_allocation_uses_independent_inclusive_pools[used_uids2-used_gids2-expected2]
+FAILED tests/req001/test_workspace_provisioning.py::test_allocation_uses_independent_inclusive_pools[used_uids3-used_gids3-expected3]
+FAILED tests/req001/test_workspace_provisioning.py::test_allocation_uses_independent_inclusive_pools[used_uids4-used_gids4-expected4]
+FAILED tests/req001/test_workspace_provisioning.py::test_pool_exhaustion_is_explicit_and_does_not_change_inputs[used_uids0-used_gids0-uid_pool_exhausted]
+FAILED tests/req001/test_workspace_provisioning.py::test_pool_exhaustion_is_explicit_and_does_not_change_inputs[used_uids1-used_gids1-gid_pool_exhausted]
+FAILED tests/req001/test_workspace_provisioning.py::test_pool_exhaustion_is_explicit_and_does_not_change_inputs[used_uids2-used_gids2-uid_pool_exhausted]
+FAILED tests/req001/test_workspace_provisioning.py::test_two_users_receive_distinct_ready_workspaces
+FAILED tests/req001/test_workspace_provisioning.py::test_repeated_access_and_new_provisioner_preserve_home_and_ids
+FAILED tests/req001/test_workspace_provisioning.py::test_concurrent_first_access_has_no_duplicate_or_shared_identity[same-user]
+FAILED tests/req001/test_workspace_provisioning.py::test_concurrent_first_access_has_no_duplicate_or_shared_identity[different-users]
+FAILED tests/req001/test_workspace_provisioning.py::test_unowned_existing_resource_is_skipped_without_adoption[account]
+FAILED tests/req001/test_workspace_provisioning.py::test_unowned_existing_resource_is_skipped_without_adoption[group]
+FAILED tests/req001/test_workspace_provisioning.py::test_unowned_existing_resource_is_skipped_without_adoption[home]
+FAILED tests/req001/test_workspace_provisioning.py::test_retry_after_permission_step_failure_reuses_original_account
+FAILED tests/req001/test_workspace_provisioning.py::test_resolver_skips_real_independent_uid_and_gid_reservations
+FAILED tests/req001/test_workspace_provisioning.py::test_resolver_exhaustion_from_nss_snapshot_creates_no_os_resources[uid]
+FAILED tests/req001/test_workspace_provisioning.py::test_resolver_exhaustion_from_nss_snapshot_creates_no_os_resources[gid]
+FAILED tests/req001/test_workspace_recovery.py::test_invalid_persistent_state_fails_without_repairing_or_adopting_data[bad-json]
+FAILED tests/req001/test_workspace_recovery.py::test_invalid_persistent_state_fails_without_repairing_or_adopting_data[unknown-version]
+FAILED tests/req001/test_workspace_recovery.py::test_another_complete_id_reserving_candidate_name_is_preserved_and_skipped
+FAILED tests/req001/test_workspace_recovery.py::test_real_eight_digit_collision_persists_distinct_names_across_retry_and_recreation
+FAILED tests/req001/test_workspace_recovery.py::test_random_retry_checks_registry_account_group_home_and_repeated_candidates[-candidates0-u5abcde90]
+FAILED tests/req001/test_workspace_recovery.py::test_random_retry_checks_registry_account_group_home_and_repeated_candidates[rng_-candidates1-rng_5abcde90]
+FAILED tests/req001/test_workspace_recovery.py::test_32_occupied_random_candidates_fail_without_partial_binding
+FAILED tests/req001/test_workspace_recovery.py::test_random_name_permission_failure_retries_the_persisted_binding
+FAILED tests/req001/test_workspace_recovery.py::test_verified_existing_out_of_range_account_keeps_its_numeric_ids
+FAILED tests/req001/test_workspace_recovery.py::test_absent_os_account_is_recreated_from_retained_registry_and_home
+FAILED tests/req001/test_workspace_recovery.py::test_reserved_private_group_can_be_resumed_after_interruption[planned]
+FAILED tests/req001/test_workspace_recovery.py::test_reserved_private_group_can_be_resumed_after_interruption[group_ready]
+FAILED tests/req001/test_workspace_recovery.py::test_symbolic_link_home_is_not_adopted_or_repaired
+FAILED tests/req001/test_workspace_recovery.py::test_processes_share_one_consistent_initialization_journal[same-user]
+FAILED tests/req001/test_workspace_recovery.py::test_processes_share_one_consistent_initialization_journal[different-users]
+FAILED tests/req001/test_workspace_recovery.py::test_processes_share_one_consistent_initialization_journal[colliding-users]
+236 failed, 54 passed, 1 warning in 3.91s
