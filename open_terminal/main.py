@@ -31,7 +31,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from starlette.formparsers import MultiPartParser, MultiPartException, parse_options_header
 from pydantic import BaseModel, Field, TypeAdapter, ValidationError
 
-from open_terminal.dependencies import get_filesystem, matches_api_key, verify_api_key
+from open_terminal.dependencies import get_filesystem, matches_api_key, require_user_identity, verify_api_key
 from open_terminal.env import API_KEY, BINARY_FILE_MIME_PREFIXES, CORS_ALLOWED_ORIGINS, ENABLE_NOTEBOOKS, ENABLE_SYSTEM_PROMPT, ENABLE_TERMINAL, EXECUTE_DESCRIPTION, EXECUTE_TIMEOUT, FILE_BROWSER_ROOT, LOG_DIR, MAX_TERMINAL_SESSIONS, MULTI_USER, OPEN_TERMINAL_INFO, PROCESS_LOG_RETENTION, SESSION_CWD_TTL, SYSTEM_PROMPT, TERMINAL_TERM
 from open_terminal.env import sanitized_environ
 from open_terminal.utils.runner import PipeRunner, ProcessRunner, create_runner, read_pty, write_pty, PtyRunner
@@ -45,6 +45,11 @@ MATCH_PAGE_SIZE = 100
 MAX_CONTENT_MATCHES_PER_FILE = 3
 MAX_CONTENT_SEARCH_FILE_SIZE = 1 * 1024 * 1024
 log = logging.getLogger(__name__)
+
+# Authentication precedes identity validation, and neither prepares an account.
+# Resource handlers decide whether they need a filesystem; metadata keeps its
+# existing service-key policy without requiring a user context.
+_RESOURCE_DEPENDENCIES = [Depends(verify_api_key), Depends(require_user_identity)]
 
 if MULTI_USER:
     from open_terminal.utils.user_isolation import check_environment
@@ -551,7 +556,7 @@ async def _list_skills_in_dir(fs: UserFS, root: str, scope: str) -> list[SkillSu
 @app.get(
     "/files/cwd",
     include_in_schema=False,
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
 )
 async def get_cwd(
     http_request: Request,
@@ -571,7 +576,7 @@ async def get_cwd(
 @app.post(
     "/files/cwd",
     include_in_schema=False,
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
 )
 async def set_cwd(
     http_request: Request,
@@ -590,7 +595,7 @@ async def set_cwd(
     "/skills",
     response_model=list[SkillSummary],
     include_in_schema=False,
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
 )
 async def list_skills(
     http_request: Request,
@@ -619,7 +624,7 @@ async def list_skills(
     "/skills/read",
     response_model=SkillReadResponse,
     include_in_schema=False,
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
 )
 async def read_skill(
     http_request: Request,
@@ -647,7 +652,7 @@ async def read_skill(
     operation_id="list_files",
     summary="List directory contents",
     description="Return a structured listing of files and directories at the given path.",
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
     responses={
         404: {"description": "Directory not found."},
         401: {"description": "Invalid or missing API key."},
@@ -667,7 +672,7 @@ async def list_files(
     return {"dir": target, "writable": await fs.is_writable(target), "entries": entries}
 
 
-@app.post("/files/compare", dependencies=[Depends(verify_api_key)], include_in_schema=False)
+@app.post("/files/compare", dependencies=_RESOURCE_DEPENDENCIES, include_in_schema=False)
 async def compare_files(http_request: Request, payload: CompareRequest, fs: UserFS = Depends(get_filesystem)):
     session_id = http_request.headers.get("x-session-id")
     cwd = _get_session_cwd(session_id, fs) if session_id else None
@@ -679,7 +684,7 @@ async def compare_files(http_request: Request, payload: CompareRequest, fs: User
     operation_id="read_file",
     summary="Read a file",
     description="Read a file and return its contents. Supports text files and images (PNG, JPEG, WebP, etc.). For text files you can optionally request a specific line range. Images are returned as binary so you can view and analyze them directly. Use display_file to show a file to the user.",
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
     responses={
         404: {"description": "File not found."},
         415: {"description": "Unsupported binary file type."},
@@ -739,7 +744,7 @@ async def read_file(
     operation_id="display_file",
     summary="Display a file to the user",
     description="Open a file in the user's file viewer so they can see it. Use this when the user wants to view or look at a file. This does not return file content to you — use read_file if you need to read the content yourself.",
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
     responses={
         401: {"description": "Invalid or missing API key."},
     },
@@ -766,7 +771,7 @@ async def display_file(
 @app.get(
     "/files/view",
     include_in_schema=False,
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
 )
 async def view_file(
     path: str = Query(..., description="Path to the file to view."),
@@ -806,7 +811,7 @@ async def view_file(
 @app.get(
     "/files/serve/{path:path}",
     include_in_schema=False,
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
 )
 async def serve_file(path: str, fs: UserFS = Depends(get_filesystem)):
     """Path-based alias for view_file — enables relative URL resolution in iframes."""
@@ -818,7 +823,7 @@ async def serve_file(path: str, fs: UserFS = Depends(get_filesystem)):
     operation_id="write_file",
     summary="Write a file",
     description="Write text content to a file. Creates parent directories automatically. Overwrites if the file already exists.",
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
     responses={
         401: {"description": "Invalid or missing API key."},
     },
@@ -837,7 +842,7 @@ async def write_file(http_request: Request, request: WriteRequest, fs: UserFS = 
 @app.post(
     "/files/mkdir",
     include_in_schema=False,
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
 )
 async def mkdir(request: MkdirRequest, fs: UserFS = Depends(get_filesystem)):
     target = fs.resolve_path(request.path)
@@ -851,7 +856,7 @@ async def mkdir(request: MkdirRequest, fs: UserFS = Depends(get_filesystem)):
 @app.delete(
     "/files/delete",
     include_in_schema=False,
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
 )
 async def delete_entry(
     path: str = Query(..., description="Path to delete."),
@@ -871,7 +876,7 @@ async def delete_entry(
 @app.post(
     "/files/move",
     include_in_schema=False,
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
 )
 async def move_entry(request: MoveRequest, fs: UserFS = Depends(get_filesystem)):
     source = fs.resolve_path(request.source)
@@ -899,7 +904,7 @@ async def move_entry(request: MoveRequest, fs: UserFS = Depends(get_filesystem))
     operation_id="replace_file_content",
     summary="Replace content in a file",
     description="Find and replace exact strings in a file. Supports multiple replacements in one call with optional line range narrowing.",
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
     responses={
         404: {"description": "File not found."},
         400: {"description": "Target string not found or ambiguous match."},
@@ -956,7 +961,7 @@ async def replace_file_content(http_request: Request, request: ReplaceRequest, f
     operation_id="grep_search",
     summary="Search file contents",
     description="Search for a text pattern across files in a directory. Returns structured matches with file paths, line numbers, and matching lines. Skips binary files.",
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
     responses={
         404: {"description": "Search path not found."},
         400: {"description": "Invalid regex pattern."},
@@ -1070,7 +1075,7 @@ async def grep_search(
     operation_id="match_files",
     summary="Search files by name and contents",
     description="Search files and directories by ranked name, path, and content matches.",
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
     responses={
         400: {"description": "Blank query."},
         404: {"description": "Search directory not found."},
@@ -1156,7 +1161,7 @@ async def match_files(
     operation_id="search_files",
     summary="Search files by name",
     description="Search for files and subdirectories by ranked filename match.",
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
     responses={
         404: {"description": "Search directory not found."},
         401: {"description": "Invalid or missing API key."},
@@ -1209,7 +1214,7 @@ async def search_files(
     operation_id="glob_search",
     summary="Search files by name",
     description="Search for files and subdirectories by name within a specified directory using glob patterns. Results will include the relative path, type, size, and modification time.",
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
     responses={
         404: {"description": "Search directory not found."},
         401: {"description": "Invalid or missing API key."},
@@ -1327,7 +1332,7 @@ class UploadParser(MultiPartParser):
     operation_id="upload_file",
     summary="Upload a file",
     description="Save a file to the specified path via multipart form data.",
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
     responses={
         401: {"description": "Invalid or missing API key."},
     },
@@ -1387,7 +1392,7 @@ class ArchiveRequest(BaseModel):
 @app.post(
     "/files/archive",
     include_in_schema=False,
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
 )
 async def archive_paths(
     request: ArchiveRequest,
@@ -1464,7 +1469,7 @@ async def archive_paths(
     operation_id="list_processes",
     summary="List running commands",
     description="Returns tracked processes for the current user and chat, including running, done, and killed.",
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
     responses={
         401: {"description": "Invalid or missing API key."},
     },
@@ -1490,7 +1495,7 @@ async def list_processes(http_request: Request):
     operation_id="run_command",
     summary="Execute a command",
     description=_EXECUTE_DESCRIPTION,
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
     responses={
         401: {"description": "Invalid or missing API key."},
     },
@@ -1553,7 +1558,7 @@ async def execute(
     operation_id="get_process_status",
     summary="Get command status and output",
     description="Returns new output since the given offset, process status, and exit code. Reads do not consume output; each reader keeps its own offset.",
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
     responses={
         404: {"description": "Process not found."},
         401: {"description": "Invalid or missing API key."},
@@ -1605,7 +1610,7 @@ async def get_status(
     operation_id="send_process_input",
     summary="Send input to a running command",
     description="Write text to the process's stdin. Include newline characters as needed.",
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
     responses={
         404: {"description": "Process not found."},
         400: {"description": "Process has already exited or stdin is closed."},
@@ -1640,7 +1645,7 @@ async def send_input(process_id: str, body: InputRequest, http_request: Request)
     operation_id="kill_process",
     summary="Kill a running command",
     description="Terminate the process. Sends SIGTERM by default for graceful shutdown. Use force=true to send SIGKILL.",
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
     responses={
         404: {"description": "Process not found."},
         401: {"description": "Invalid or missing API key."},
@@ -1669,14 +1674,8 @@ from open_terminal.utils.port import detect_listening_ports, get_descendant_pids
 
 
 async def _visible_ports(request: Request) -> list[dict]:
+    fs = get_filesystem(request)
     all_ports = await run_io(detect_listening_ports)
-
-    try:
-        fs = get_filesystem(request)
-    except Exception:
-        # User provisioning failed (e.g. useradd rejected in restricted
-        # container runtimes).  An unprovisioned user has no ports.
-        return []
 
     if fs.username:
         # Filter by user UID
@@ -1695,7 +1694,7 @@ async def _visible_ports(request: Request) -> list[dict]:
 @app.get(
     "/ports",
     include_in_schema=False,
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
 )
 async def list_ports(request: Request):
     """Return TCP ports currently listening on localhost.
@@ -1731,7 +1730,7 @@ async def _get_port_proxy_client():
     "/proxy/{port}/{path:path}",
     methods=["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
     include_in_schema=False,
-    dependencies=[Depends(verify_api_key)],
+    dependencies=_RESOURCE_DEPENDENCIES,
 )
 async def port_proxy(port: int, path: str, request: Request):
     """Reverse-proxy a request to localhost:{port}/{path}."""
@@ -1856,7 +1855,7 @@ if ENABLE_TERMINAL:
                 pty_proc.terminate()
 
 
-    @app.post("/api/terminals", dependencies=[Depends(verify_api_key)], include_in_schema=False)
+    @app.post("/api/terminals", dependencies=_RESOURCE_DEPENDENCIES, include_in_schema=False)
     async def create_terminal(request: Request):
         """Create a new terminal session and return its ID."""
         if _TERMINAL_BACKEND is None:
@@ -2001,7 +2000,7 @@ if ENABLE_TERMINAL:
                 await asyncio.to_thread(session["pty_process"].write, data.decode(errors="replace"))
 
 
-    @app.get("/api/terminals/user/output", operation_id="read_user_terminal", dependencies=[Depends(verify_api_key)])
+    @app.get("/api/terminals/user/output", operation_id="read_user_terminal", dependencies=_RESOURCE_DEPENDENCIES)
     async def read_user_terminal(request: Request):
         """Read recent output from the user's connected shell. Inspect before sending input:
         a foreground program may already be running. Does not create a shell."""
@@ -2009,7 +2008,7 @@ if ENABLE_TERMINAL:
         return {"output": bytes(session["output"]).decode(errors="replace")}
 
 
-    @app.post("/api/terminals/user/input", operation_id="send_user_terminal_input", dependencies=[Depends(verify_api_key)])
+    @app.post("/api/terminals/user/input", operation_id="send_user_terminal_input", dependencies=_RESOURCE_DEPENDENCIES)
     async def send_user_terminal_input(request: Request, body: InputRequest):
         """Send literal text to the user's connected shell or its foreground program.
         Include actual newlines to submit input. Read the shell first. Sending input
@@ -2022,7 +2021,7 @@ if ENABLE_TERMINAL:
         return {"status": "ok"}
 
 
-    @app.get("/api/terminals", dependencies=[Depends(verify_api_key)], include_in_schema=False)
+    @app.get("/api/terminals", dependencies=_RESOURCE_DEPENDENCIES, include_in_schema=False)
     async def list_terminals(request: Request):
         """List active terminal sessions."""
         result = []
@@ -2043,7 +2042,7 @@ if ENABLE_TERMINAL:
         return result
 
 
-    @app.get("/api/terminals/{session_id}", dependencies=[Depends(verify_api_key)], include_in_schema=False)
+    @app.get("/api/terminals/{session_id}", dependencies=_RESOURCE_DEPENDENCIES, include_in_schema=False)
     async def get_terminal(session_id: str, request: Request):
         """Get info about a terminal session."""
         session = _terminal_sessions.get(session_id)
@@ -2059,7 +2058,7 @@ if ENABLE_TERMINAL:
         }
 
 
-    @app.delete("/api/terminals/{session_id}", dependencies=[Depends(verify_api_key)], include_in_schema=False)
+    @app.delete("/api/terminals/{session_id}", dependencies=_RESOURCE_DEPENDENCIES, include_in_schema=False)
     async def delete_terminal(session_id: str, request: Request):
         """Kill and remove a terminal session."""
         if session_id not in _terminal_sessions or not _owns_terminal(_terminal_sessions[session_id], request):
@@ -2085,16 +2084,6 @@ if ENABLE_TERMINAL:
 
             {"type": "resize", "cols": 120, "rows": 40}
         """
-        session = _terminal_sessions.get(session_id)
-        if session is None:
-            await ws.close(code=4004, reason="Session not found")
-            return
-
-        if not _session_is_alive(session):
-            await _cleanup_session(session_id)
-            await ws.close(code=4004, reason="Session has ended")
-            return
-
         await ws.accept()
 
         # First-message authentication
@@ -2107,11 +2096,25 @@ if ENABLE_TERMINAL:
         except (asyncio.TimeoutError, ValueError, AttributeError, KeyError, WebSocketDisconnect):
             await ws.close(code=4001, reason="Auth timeout or invalid payload")
             return
+
+        try:
+            require_user_identity(ws)
+        except HTTPException:
+            await ws.close(code=4001, reason="Invalid user identity")
+            return
+
+        session = _terminal_sessions.get(session_id)
         if (
-            session["user_id"] != ws.headers.get("x-user-id", "")
+            session is None
+            or session["user_id"] != ws.headers.get("x-user-id", "")
             or session["chat_id"] != ws.headers.get("x-session-id", payload.get("chat_id", ""))
         ):
             await ws.close(code=4004, reason="Session not found")
+            return
+
+        if not _session_is_alive(session):
+            await _cleanup_session(session_id)
+            await ws.close(code=4004, reason="Session has ended")
             return
 
         backend = session["backend"]

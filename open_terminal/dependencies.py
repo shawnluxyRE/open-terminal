@@ -7,6 +7,7 @@ from starlette.requests import HTTPConnection
 
 from open_terminal.env import API_KEY, MULTI_USER
 from open_terminal.utils.fs import UserFS
+from open_terminal.utils.identity import InvalidUserIdentity, WorkspaceProvisionError, validate_user_id
 
 if MULTI_USER:
     from open_terminal.utils.user_isolation import resolve_user
@@ -14,32 +15,40 @@ if MULTI_USER:
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
+_WORKSPACE_ERROR_STATUS = {
+    "identity_conflict": 409,
+    "uid_pool_exhausted": 503,
+    "gid_pool_exhausted": 503,
+    "username_allocation_failed": 503,
+    "workspace_busy": 503,
+    "workspace_unavailable": 503,
+    "workspace_state_invalid": 500,
+    "workspace_config_invalid": 500,
+}
+
 
 def require_user_identity(connection: HTTPConnection) -> str | None:
-    """REQ-001 resource identity dependency (R2 skeleton; not yet wired).
+    """Validate one resource identity header after service-key authentication.
 
-    Preconditions: HTTP callers run verify_api_key before this dependency; WS
-    callers validate the existing first-message service token before invoking
-    the shared identity parsing logic. This function never provisions accounts.
-
-    In multi-user mode require exactly one X-User-Id header (case insensitive
-    name), pass its original value to utils.identity.validate_user_id and return
-    that exact ID. Missing, duplicate or invalid values raise HTTPException(400)
-    with detail={"code": "invalid_user_identity", "message": "Invalid user identity"}.
-    No raw ID or credential is included. In explicit single-user mode return
-    None without requiring a header, importing Linux modules or creating state.
-
-    R4 must attach this only to user-resource HTTP routes, including list/control
-    routes which do not call get_filesystem. Metadata routes retain their existing
-    API-key policy and do not require identity. get_filesystem must also call it
-    because callers outside the route dependency chain use that function directly.
-    Do not make a general service-key check implicitly provision an account.
-
-    WS maps the same invalid identity to close code 4001 after authenticating;
-    valid identities use the existing user/chat ownership check (4004 on mismatch).
-    Keep WS transport error handling outside this HTTPException-based adapter.
+    Multi-user mode returns the exact X-User-Id; missing, repeated or invalid
+    headers raise HTTP 400 with the fixed ``invalid_user_identity`` detail.
+    Single-user mode returns None. This dependency never prepares an account.
+    WS callers translate invalid identity to close code 4001; metadata routes
+    keep their existing policy. See docs/design/workspace-identity.md.
     """
-    raise NotImplementedError("REQ-001: implement resource identity dependency")
+    if not MULTI_USER:
+        return None
+    # Read the raw ASGI fields so duplicate values cannot be merged or selected.
+    values = [value for name, value in connection.scope.get("headers", []) if name.lower() == b"x-user-id"]
+    try:
+        if len(values) != 1:
+            raise InvalidUserIdentity("Invalid user identity")
+        return validate_user_id(values[0].decode("latin-1"))
+    except InvalidUserIdentity:
+        raise HTTPException(
+            status_code=400,
+            detail={"code": "invalid_user_identity", "message": "Invalid user identity"},
+        ) from None
 
 
 def matches_api_key(token: object) -> bool:
@@ -65,10 +74,16 @@ def get_filesystem(request: Request) -> UserFS:
     Multi-user mode requires ``X-User-Id`` to select the user's workspace.
     Otherwise returns a plain ``UserFS`` using stdlib.
     """
-    if not MULTI_USER:
+    user_id = require_user_identity(request)
+    if user_id is None:
         return UserFS()
-    user_id = request.headers.get("x-user-id")
-    if not user_id:
-        raise HTTPException(status_code=400, detail="X-User-Id is required in multi-user mode")
-    username, home = resolve_user(user_id)
+    try:
+        username, home = resolve_user(user_id)
+    except WorkspaceProvisionError as exc:
+        # Never relay command stderr, paths, IDs, or an unrecognized code.
+        code = exc.code if exc.code in _WORKSPACE_ERROR_STATUS else "workspace_unavailable"
+        raise HTTPException(
+            status_code=_WORKSPACE_ERROR_STATUS[code],
+            detail={"code": code, "message": "Workspace preparation failed"},
+        ) from None
     return UserFS(username=username, home=home)

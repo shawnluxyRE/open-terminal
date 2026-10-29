@@ -23,3 +23,6 @@ uv.lock
 Thumbs.db
 
 .env
+
+# workflow evidence
+/docs/dev-workflow/**/evidence/

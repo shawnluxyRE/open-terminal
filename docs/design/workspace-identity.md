@@ -1,10 +1,10 @@
 # 可信身份与工作空间归属模块设计
 
 - 关联需求：[opt-user-space / REQ-001](../dev-workflow/opt-user-space/requirements.md)，AC-001～004、AC-032～033；恢复契约关联 REQ-007 的 AC-023、AC-034。
-- 修订：v1.2，2026-10-28，按用户意见增加重名时随机换名；短名及其他设计继续沿用。
+- 修订：v1.3，2026-10-29，精简接口注释；行为契约继续沿用 v1.2。
 - 基线：Open Terminal 0.14.5；Open WebUI v0.12.3 只读；分支 `code/opt-req001`。
 - 代码：[identity.py](../../open_terminal/utils/identity.py)、[user_isolation.py](../../open_terminal/utils/user_isolation.py)、[dependencies.py](../../open_terminal/dependencies.py)；接入位置 [main.py](../../open_terminal/main.py)。
-- 当前交付是设计、可导入接口骨架和业务预期测试；新增入口尚未接线，既有运行逻辑保持原状。
+- v1.0～v1.2 为 R2 设计、接口骨架与测试交付；后续实现及验收见 [R4 交接](../dev-workflow/opt-user-space/REQ-001/handoff-r4.md)和 [R5 交接](../dev-workflow/opt-user-space/REQ-001/handoff-r5.md)。v1.3 只精简当前实现中的接口注释，不修改业务逻辑或测试。
 
 ## 职责与范围
 
@@ -171,6 +171,8 @@ HTTP 准备错误统一 `{"detail":{"code":"...","message":"Workspace preparatio
 
 ## 接口与验证依据
 
+接口注释仅保留职责、输入/输出及关键异常和约束。认证链路、完整状态机、存储格式、碰撞概率、权限与恢复细节统一以本文为准，避免在每个函数中重复展开。
+
 | 入口 | 骨架/契约 | 验收与测试 |
 | --- | --- | --- |
 | `validate_user_id` | identity.py；原样值、语法与异常 | AC-001/002/003；test_identity_values.py |
@@ -197,4 +199,5 @@ HTTP 使用真实 app/TestClient，隔离账号准备边界、端口扫描和空
 | --- | --- | --- |
 | v1.0（历史，已替代） | 2026-10-27 | 首次 R2 设计采用较长的固定哈希账号名，已由 v1.1 的短名规则替代。 |
 | v1.1（历史，部分已替代） | 2026-10-28 | 改为8位哈希，拼 prefix 后仅数字开头补 `u`；当时首次重名直接拒绝的策略已由 v1.2 自动随机换名替代。 |
-| v1.2（当前） | 2026-10-28 | 用户指出可在首次重名后随机重选：最多32次随机8位候选，确认空闲后持久绑定并跨重试/重建复用；清单加 prefix，新增错误及相关测试。同步清理旧例示歧义，当前示例全部使用8位主体。完整ID归属、已绑定异常拒绝及UID/GID规则不变。 |
+| v1.2（契约沿用） | 2026-10-28 | 用户指出可在首次重名后随机重选：最多32次随机8位候选，确认空闲后持久绑定并跨重试/重建复用；清单加 prefix，新增错误及相关测试。同步清理旧例示歧义，当前示例全部使用8位主体。完整ID归属、已绑定异常拒绝及UID/GID规则不变。 |
+| v1.3（当前） | 2026-10-29 | 按用户要求精简 identity.py、dependencies.py、user_isolation.py 的12处注释，删除重复流程与背景，保留接口关键契约并引用本文。当前已有R4/R5实现保持；去除docstring后的AST及源码文本与修改前一致，未改测试。 |

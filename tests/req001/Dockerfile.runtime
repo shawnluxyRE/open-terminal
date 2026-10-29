@@ -1,0 +1,13 @@
+# Rebuild the lab application on the exact standard runtime used by the tests.
+# Tag its original image as req001-r4-base before replacing the deployment tag.
+ARG BASE_IMAGE=webui-lab/open-terminal:req001-r4-base
+FROM ${BASE_IMAGE}
+USER root
+WORKDIR /app
+COPY pyproject.toml README.md ./
+COPY open_terminal ./open_terminal
+COPY entrypoint.sh ./entrypoint.sh
+RUN python -m pip install --no-cache-dir --no-deps . \
+    && sed -i '1s|.*|#!/usr/local/bin/python3-ot|' /usr/local/bin/open-terminal
+USER user
+WORKDIR /home/user

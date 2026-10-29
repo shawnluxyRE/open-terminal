@@ -1,31 +1,25 @@
 """REQ-001 identity contracts, shared by HTTP, WebSocket and Linux provisioning.
 
-R2 interface skeleton: the validator intentionally has no business implementation.
 See ``docs/design/workspace-identity.md`` for integration and error translation.
 This module must remain importable without Linux-only modules in single-user mode.
 """
 
+import re
 from dataclasses import dataclass
 
 
-class InvalidUserIdentity(ValueError):
-    """The upstream identity is missing or outside the supported wire grammar.
+_USER_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:@-]{0,127}")
 
-    Transport adapters expose a fixed message/code, never the rejected header.
-    This error does not assert whether a syntactically valid ID exists upstream:
-    Open WebUI authenticates accounts; Open Terminal trusts the administrator's
-    authenticated service connection. Raising it must not create OS resources.
-    """
+
+class InvalidUserIdentity(ValueError):
+    """Missing or malformed upstream ID; this does not authenticate an account."""
 
 
 class WorkspaceProvisionError(RuntimeError):
-    """A workspace could not be safely made available.
+    """Workspace preparation failure with a stable diagnostic ``code``.
 
-    ``code`` is a stable diagnostic identifier from the design's error table.
-    ``message`` is an operator-safe explanation; it must not contain API keys,
-    other users' IDs, paths, file contents, or raw privileged-command stderr.
-    HTTP adapters translate this exception; the provisioning layer has no HTTP
-    dependency. A failure never authorizes fallback to the service account.
+    Keep messages free of credentials, other-user data and raw command stderr.
+    Callers translate the code; failures never permit a service-account fallback.
     """
 
     def __init__(self, code: str, message: str = "Workspace preparation failed"):
@@ -35,21 +29,11 @@ class WorkspaceProvisionError(RuntimeError):
 
 @dataclass(frozen=True)
 class WorkspaceAccount:
-    """A completely prepared, verified binding; never a partially created user.
+    """Verified binding whose home is accessible to the current server process.
 
-    Attributes:
-        user_id: Exact, case-sensitive upstream ID accepted by validate_user_id.
-        username: Linux account name and identically named private primary group.
-        home: Absolute owned directory below the configured home root. Existing
-            UserFS consumes this value without changing its public interface.
-        uid: Actual passwd UID. Newly created accounts use 10001..19999.
-        gid: Actual private primary group GID, independently allocated in the
-            same range. It need not equal uid. An existing verified account may
-            retain a previously assigned out-of-range, non-reserved uid/gid.
-
-    Returning this object means account, group, directory permissions and the
-    calling server process's group access are ready. The object is not an
-    authentication token and must not be used as a persistent cache of readiness.
+    ``user_id`` is exact and case-sensitive; ``username`` also names its private
+    primary group. ``home`` is absolute; ``uid`` and ``gid`` are actual OS IDs.
+    This immutable value is neither an auth token nor a persistent readiness cache.
     """
 
     user_id: str
@@ -60,18 +44,11 @@ class WorkspaceAccount:
 
 
 def validate_user_id(value: str | None) -> str:
-    """Validate and return an upstream ID unchanged, without any side effects.
+    """Return the ID unchanged, or raise InvalidUserIdentity for invalid input.
 
-    Accepted grammar: ASCII ``[A-Za-z0-9][A-Za-z0-9._:@-]{0,127}`` (full match).
-    Length is 1..128 characters. Short IDs, names such as ``root``, UUIDs and
-    mixed case are valid upstream identifiers, not requests to reuse OS names.
-    Reject None, non-strings, empty values, whitespace anywhere, control bytes,
-    non-ASCII characters, slashes and overlong values with InvalidUserIdentity.
-    Do not trim, lowercase, normalize, truncate or silently substitute a value.
-    For example ``A`` and ``a`` identify different accounts; ``' A'`` is invalid.
-
-    Transport adapters additionally reject repeated X-User-Id header fields.
-    Display name, login session and chat ID never affect this value. The function
-    does not authenticate the caller, look up an upstream user or touch storage.
+    Require a string matching ASCII ``[A-Za-z0-9][A-Za-z0-9._:@-]{0,127}``.
+    Do not trim or normalize; case remains significant. No I/O or authentication.
     """
-    raise NotImplementedError("REQ-001: implement exact upstream identity validation")
+    if not isinstance(value, str) or _USER_ID.fullmatch(value) is None:
+        raise InvalidUserIdentity("Invalid user identity")
+    return value
