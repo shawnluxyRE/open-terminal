@@ -259,7 +259,39 @@ Set `OPEN_TERMINAL_FILE_BROWSER_ROOT` to:
 | `{{home}}/project` | Report a path under the current user's home |
 | `filesystem` | Opt out and report no visual root metadata |
 
-This is a UI hint for clients. It does not restrict terminal commands or file APIs.
+This is a UI hint for clients. It does not restrict terminal commands or grant
+file API access outside the user's authorized directories.
+
+### Public Read-Only Material
+
+In multi-user mode, file APIs allow users to read and write their own home.
+Other locations are denied unless an administrator declares a public read-only
+directory with `OPEN_TERMINAL_PUBLIC_READ_ROOTS`. The value is a JSON array of
+absolute directory paths and defaults to `[]`:
+
+```bash
+OPEN_TERMINAL_PUBLIC_READ_ROOTS='["/opt/reference"]'
+```
+
+The equivalent configuration-file setting is a string containing the same JSON:
+
+```toml
+public_read_roots = '["/opt/reference"]'
+```
+
+The environment variable takes precedence over the configuration file. Every
+directory must already exist, and neither it nor its ancestors may be symlinks.
+Declarations overlapping `/home`, the service account's home, service logs,
+temporary storage, `/root`, `/proc`, `/sys` or `/dev` are rejected. An invalid
+declaration prevents multi-user startup with `Invalid public read roots`.
+Single-user mode ignores this setting and retains its existing file access.
+
+Mount or populate a separate directory such as `/opt/reference` before starting
+the service. Public files remain read-only through file APIs even when their OS
+permissions allow writes. Symlinks are checked for each requesting user and do
+not publish private files. Changes require a new service process; with Docker
+Compose, apply changed environment settings using `docker compose up -d`.
+File-browser navigation settings do not expand these permissions.
 
 ### External Workspace Storage
 

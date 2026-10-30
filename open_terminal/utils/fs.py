@@ -24,6 +24,7 @@ import aiofiles
 import aiofiles.os
 from starlette.responses import FileResponse
 
+from open_terminal.utils.file_access import FileAccessDenied, FileAccessPolicy
 from open_terminal.utils.limits import CHUNK_SIZE, run_io
 
 
@@ -140,13 +141,21 @@ class UserFS:
     *username* is used for ownership fixups after writes (``None`` = stdlib).
     *home* is the user's home directory (default working directory).
 
-    When *username* is set, path validation prevents access to other
-    users' home directories (``/home/<other_user>/…``).
+    When *username* is set, all file operations authorize the lexical entry
+    and resolved target against this home and the public read-only roots.
     """
 
-    def __init__(self, username: str | None = None, home: str | None = None):
+    def __init__(
+        self,
+        username: str | None = None,
+        home: str | None = None,
+        *,
+        public_read_roots: tuple[str, ...] = (),
+    ):
         self.username = username
         self.home = home or os.getcwd()
+        self.public_read_roots = public_read_roots
+        self._policy = FileAccessPolicy(self.home, public_read_roots) if username else None
 
     # ------------------------------------------------------------------
     # Path resolution
@@ -155,7 +164,7 @@ class UserFS:
     def resolve_path(self, path: str, cwd: str | None = None) -> str:
         """Resolve *path* to an absolute path relative to the user's home.
 
-        Absolute paths are normalised in place.  Relative paths are joined
+        Relative paths are joined
         to *cwd* (if provided) or ``self.home`` so that they resolve against
         the session's working directory rather than the server process's
         ``os.getcwd()``.
@@ -167,7 +176,7 @@ class UserFS:
         if os.path.isabs(path):
             # Swap /home/user (and /home/usr, a common LLM hallucination)
             # → user's actual home when multi-user is active
-            if self.username and self.home != "/home/user":
+            if self.username:
                 for prefix in ("/home/user", "/home/usr"):
                     if path == prefix:
                         path = self.home
@@ -175,34 +184,36 @@ class UserFS:
                     elif path.startswith(prefix + "/"):
                         path = self.home + path[len(prefix):]
                         break
-            return os.path.normpath(path)
-        return os.path.normpath(os.path.join(cwd or self.home, path))
+        else:
+            path = os.path.join(cwd or self.home, path)
+        # Resolving '..' before following a symlink could turn an unauthorized
+        # path into an apparently private path. The policy resolves in OS order.
+        return path if self.username else os.path.normpath(path)
 
     # ------------------------------------------------------------------
     # Path validation
     # ------------------------------------------------------------------
 
+    def require_path(self, path: str, *, write: bool = False) -> str:
+        """REQ-002 entry point: authorize before I/O and return a canonical path.
+
+        Multi-user mode delegates to FileAccessPolicy for this home and the
+        administrator's public read roots; rejection is FileAccessDenied with
+        a fixed message. Single-user mode keeps existing unrestricted behavior.
+        Callers resolve aliases/cwd first.
+        See docs/design/file-access.md for enumeration and move/remove rules.
+        """
+        if self._policy is not None:
+            return self._policy.require(path, write=write)
+        return path
+
     def is_path_allowed(self, path: str) -> bool:
-        """Return *False* if *path* is inside another user's home directory."""
-        if not self.username:
-            return True
-        resolved = os.path.abspath(path)
-        if not resolved.startswith("/home/"):
-            return True
-        parts = resolved.split("/")  # ['', 'home', '<user>', ...]
-        if len(parts) >= 3:
-            target_user_dir = parts[2]
-            own_home_name = os.path.basename(self.home)
-            if target_user_dir != own_home_name:
-                return False
-        return True
+        """Return whether a path can be read without exposing denied entries."""
+        return self._policy is None or self._policy.allows(path)
 
     def _check_path(self, path: str) -> None:
-        """Reject paths inside another user's home directory."""
-        if not self.is_path_allowed(path):
-            raise PermissionError(
-                f"Access denied: {os.path.abspath(path)} belongs to another user"
-            )
+        """Compatibility read check; I/O callers should use require_path's result."""
+        self.require_path(path)
 
     async def _chown(self, path: str) -> None:
         """Fix ownership of *path* to the provisioned user.
@@ -212,11 +223,16 @@ class UserFS:
         subsequent writes.
         """
         if self.username:
+            is_link = os.path.islink(path)
             await asyncio.to_thread(
                 subprocess.run,
-                ["sudo", "chown", f"{self.username}:{self.username}", path],
+                ["sudo", "chown", "-h", f"{self.username}:{self.username}", path],
                 check=True, capture_output=True,
             )
+            # A renamed relative symlink can refer to a different target. Only
+            # change the link owner, never permissions on its target.
+            if is_link:
+                return
             await asyncio.to_thread(
                 subprocess.run,
                 ["sudo", "chmod", "g+w", path],
@@ -260,44 +276,46 @@ class UserFS:
 
     async def read(self, path: str) -> bytes:
         """Read raw bytes from *path*."""
-        self._check_path(path)
+        path = self.require_path(path)
         async with aiofiles.open(path, "rb") as f:
             return await f.read()
 
     async def read_text(self, path: str, encoding: str = "utf-8") -> str:
         """Read text from *path*."""
-        self._check_path(path)
+        path = self.require_path(path)
         async with aiofiles.open(path, "r", encoding=encoding, errors="strict") as f:
             return await f.read()
 
     async def exists(self, path: str) -> bool:
         """Check if *path* exists."""
-        self._check_path(path)
+        path = self.require_path(path)
         return await aiofiles.os.path.exists(path)
 
     async def isfile(self, path: str) -> bool:
         """Check if *path* is a regular file."""
-        self._check_path(path)
+        path = self.require_path(path)
         return await aiofiles.os.path.isfile(path)
 
     async def isdir(self, path: str) -> bool:
         """Check if *path* is a directory."""
-        self._check_path(path)
+        path = self.require_path(path)
         return await aiofiles.os.path.isdir(path)
 
     async def stat(self, path: str) -> dict:
         """Return size, mtime, and type for *path*."""
-        self._check_path(path)
-        s = await aiofiles.os.stat(path)
+        target = self.require_path(path)
+        s = await aiofiles.os.stat(target)
         return {
             "size": s.st_size,
             "modified": s.st_mtime,
-            "type": "directory" if os.path.isdir(path) else "file",
+            "type": "directory" if os.path.isdir(target) else "file",
             "writable": self._is_writable_sync(path),
         }
 
     def _is_writable_sync(self, path: str) -> bool:
-        if not self.is_path_allowed(path):
+        try:
+            path = self.require_path(path, write=True)
+        except PermissionError:
             return False
         try:
             if os.statvfs(path).f_flag & getattr(os, "ST_RDONLY", 0):
@@ -315,18 +333,17 @@ class UserFS:
 
     async def listdir(self, path: str) -> list[dict]:
         """List directory contents with type, size, mtime, and writability."""
-        self._check_path(path)
+        target = self.require_path(path)
         def _list_sync():
             entries = []
-            for name in sorted(os.listdir(path)):
+            for name in sorted(os.listdir(target)):
                 full = os.path.join(path, name)
-                if not self.is_path_allowed(full):
-                    continue
                 try:
-                    s = os.stat(full)
+                    canonical = self.require_path(full)
+                    s = os.stat(canonical)
                     entries.append({
                         "name": name,
-                        "type": "directory" if os.path.isdir(full) else "file",
+                        "type": "directory" if os.path.isdir(canonical) else "file",
                         "size": s.st_size,
                         "modified": s.st_mtime,
                         "writable": self._is_writable_sync(full),
@@ -339,24 +356,34 @@ class UserFS:
     async def walk(self, path: str) -> list[tuple[str, list[str], list[str]]]:
         """Walk directory tree. Returns list of (dirpath, dirnames, filenames).
 
-        In multi-user mode, directories belonging to other users are pruned
-        so their contents are never yielded.
+        Authorize entries before metadata and omit denied names. Directory
+        symlinks can be listed but are never traversed recursively.
         """
-        self._check_path(path)
+        target = self.require_path(path)
         def _walk_filtered():
             result = []
-            for dirpath, dirnames, filenames in os.walk(path):
-                # Prune directories belonging to other users (in-place
-                # modification prevents os.walk from descending into them).
-                dirnames[:] = [
-                    d for d in dirnames
-                    if self.is_path_allowed(os.path.join(dirpath, d))
-                ]
-                filenames = [
-                    f for f in filenames
-                    if self.is_path_allowed(os.path.join(dirpath, f))
-                ]
+            pending = [(path, target)]
+            while pending:
+                dirpath, canonical_dir = pending.pop()
+                dirnames, filenames, descend = [], [], []
+                try:
+                    names = sorted(os.listdir(canonical_dir))
+                except OSError:
+                    continue
+                for name in names:
+                    full = os.path.join(dirpath, name)
+                    try:
+                        canonical = self.require_path(full)
+                        if os.path.isdir(canonical):
+                            dirnames.append(name)
+                            if not os.path.islink(os.path.join(canonical_dir, name)):
+                                descend.append((full, canonical))
+                        else:
+                            filenames.append(name)
+                    except OSError:
+                        continue
                 result.append((dirpath, dirnames, filenames))
+                pending.extend(reversed(descend))
             return result
         return await run_io(_walk_filtered)
 
@@ -366,7 +393,7 @@ class UserFS:
 
     async def write(self, path: str, content: str, encoding: str = "utf-8") -> None:
         """Write text *content* to *path*, creating parent dirs."""
-        self._check_path(path)
+        path = self.require_path(path, write=True)
         parent = os.path.dirname(path)
         if parent:
             await self._ensure_parents(parent)
@@ -376,7 +403,7 @@ class UserFS:
 
     async def write_bytes(self, path: str, data: bytes) -> None:
         """Write raw *data* to *path*, creating parent dirs."""
-        self._check_path(path)
+        path = self.require_path(path, write=True)
         parent = os.path.dirname(path)
         if parent:
             await self._ensure_parents(parent)
@@ -386,20 +413,42 @@ class UserFS:
 
     async def mkdir(self, path: str) -> None:
         """Create directory *path* and parents."""
-        self._check_path(path)
+        path = self.require_path(path, write=True)
         await self._ensure_parents(path)
+
+    def _mutation_entry(self, path: str) -> str:
+        """Authorize a mutation while preserving the final symlink entry.
+
+        Following ancestor links is necessary to locate the entry. Following
+        the last link for unlink/rename would instead mutate its target.
+        """
+        canonical = self.require_path(path, write=True)
+        if self.username and canonical == os.path.realpath(self.home):
+            raise FileAccessDenied("Access denied")
+        entry = path.rstrip(os.sep)
+        name = os.path.basename(entry)
+        if name in ("", ".", ".."):
+            return canonical
+        parent = self.require_path(os.path.dirname(entry) or ".", write=True)
+        return os.path.join(parent, name)
 
     async def remove(self, path: str) -> None:
         """Remove *path* (file or directory)."""
-        self._check_path(path)
-        if os.path.isdir(path):
+        path = self._mutation_entry(path)
+        if os.path.isdir(path) and not os.path.islink(path):
             await asyncio.to_thread(shutil.rmtree, path)
         else:
             await aiofiles.os.remove(path)
 
     async def move(self, source: str, destination: str) -> None:
         """Move *source* to *destination*."""
-        self._check_path(source)
-        self._check_path(destination)
+        source = self._mutation_entry(source)
+        destination = self._mutation_entry(destination)
+        if os.path.lexists(destination):
+            raise FileExistsError("Destination already exists")
+        if not os.path.isdir(os.path.dirname(destination)):
+            raise FileNotFoundError("Destination parent directory does not exist")
+        # shutil.move preserves links, including copytree(symlinks=True) in
+        # its cross-filesystem directory fallback; it never copies their data.
         await asyncio.to_thread(shutil.move, source, destination)
         await self._chown(destination)

@@ -3,8 +3,8 @@
 - project_root：D:\Documents\synowave\WebUI\open-terminal
 - work_id：opt-user-space
 - work_dir：D:\Documents\synowave\WebUI\open-terminal\docs\dev-workflow\opt-user-space
-- req_id：REQ-001
-- req_dir：D:\Documents\synowave\WebUI\open-terminal\docs\dev-workflow\opt-user-space\REQ-001
+- req_id：REQ-002
+- req_dir：D:\Documents\synowave\WebUI\open-terminal\docs\dev-workflow\opt-user-space\REQ-002
 - design_dir：D:\Documents\synowave\WebUI\open-terminal\docs\design
 - requirements_path：D:\Documents\synowave\WebUI\open-terminal\docs\dev-workflow\opt-user-space\requirements.md
 

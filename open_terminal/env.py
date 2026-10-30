@@ -154,6 +154,31 @@ MULTI_USER = os.environ.get(
     str(config.get("multi_user", False)),
 ).lower() not in ("false", "0", "no", "")
 
+# Public material is explicitly declared by the administrator. Validate once
+# at startup; single-user mode retains its original filesystem access.
+PUBLIC_READ_ROOTS: tuple[str, ...] = ()
+if MULTI_USER:
+    import pwd
+    import tempfile
+
+    from open_terminal.utils.file_access import parse_public_read_roots
+
+    PUBLIC_READ_ROOTS = parse_public_read_roots(
+        os.environ.get(
+            "OPEN_TERMINAL_PUBLIC_READ_ROOTS",
+            config.get("public_read_roots", "[]"),
+        ),
+        protected_roots=(
+            pwd.getpwuid(os.geteuid()).pw_dir,
+            LOG_DIR,
+            tempfile.gettempdir(),
+            "/root",
+            "/proc",
+            "/sys",
+            "/dev",
+        ),
+    )
+
 USER_PREFIX = os.environ.get(
     "OPEN_TERMINAL_USER_PREFIX",
     config.get("user_prefix", ""),

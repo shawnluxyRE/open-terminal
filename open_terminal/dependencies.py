@@ -5,7 +5,7 @@ from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from starlette.requests import HTTPConnection
 
-from open_terminal.env import API_KEY, MULTI_USER
+from open_terminal.env import API_KEY, MULTI_USER, PUBLIC_READ_ROOTS
 from open_terminal.utils.fs import UserFS
 from open_terminal.utils.identity import InvalidUserIdentity, WorkspaceProvisionError, validate_user_id
 
@@ -86,4 +86,4 @@ def get_filesystem(request: Request) -> UserFS:
             status_code=_WORKSPACE_ERROR_STATUS[code],
             detail={"code": code, "message": "Workspace preparation failed"},
         ) from None
-    return UserFS(username=username, home=home)
+    return UserFS(username=username, home=home, public_read_roots=PUBLIC_READ_ROOTS)

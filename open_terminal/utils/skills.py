@@ -12,8 +12,8 @@ MAX_SKILL_RESOURCE_FILES = 50
 
 def join_skill_path(base: str, child: str) -> str:
     if os.path.isabs(child):
-        return os.path.normpath(child)
-    return os.path.normpath(os.path.join(base, child))
+        return child
+    return os.path.join(base, child)
 
 
 def parse_skill_frontmatter(text: str) -> tuple[dict[str, str], str]:
@@ -56,7 +56,11 @@ async def list_skill_resources(fs: UserFS, skill_dir: str) -> list[str]:
     async def walk(directory: str, prefix: str = "", depth: int = 0):
         if depth >= MAX_SKILL_RESOURCE_DEPTH or len(resources) >= MAX_SKILL_RESOURCE_FILES:
             return
-        for entry in await fs.listdir(directory):
+        try:
+            entries = await fs.listdir(directory)
+        except (PermissionError, FileNotFoundError, NotADirectoryError):
+            return
+        for entry in entries:
             if len(resources) >= MAX_SKILL_RESOURCE_FILES:
                 break
             name = str(entry.get("name") or "")
@@ -64,9 +68,11 @@ async def list_skill_resources(fs: UserFS, skill_dir: str) -> list[str]:
                 continue
             rel = f"{prefix}/{name}" if prefix else name
             path = join_skill_path(directory, name)
+            if not fs.is_path_allowed(path):
+                continue
             if entry.get("type") == "file":
                 resources.append(rel)
-            elif entry.get("type") == "directory":
+            elif entry.get("type") == "directory" and not os.path.islink(path):
                 await walk(path, rel, depth + 1)
 
     await walk(skill_dir)

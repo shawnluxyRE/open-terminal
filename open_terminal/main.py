@@ -38,7 +38,7 @@ from open_terminal.utils.runner import PipeRunner, ProcessRunner, create_runner,
 from open_terminal.utils.fs import UserFS, FullFileResponse as FileResponse, TemporaryFileResponse, text_file_response, line_range_offsets
 from open_terminal.utils.limits import (CHUNK_SIZE, NormalizeNullQueryMiddleware, run_io, run_worker)
 from open_terminal.utils.file_compare import CompareRequest, run_comparison
-from open_terminal.utils.search import search_entries, matching_files, ranked_page
+from open_terminal.utils.search import search_entries, walk_entries, matching_files, ranked_page
 from open_terminal.utils.skills import join_skill_path, list_skill_resources, parse_skill_frontmatter
 
 MATCH_PAGE_SIZE = 100
@@ -226,7 +226,7 @@ app.add_middleware(
 
 @app.exception_handler(PermissionError)
 async def permission_error_handler(request: Request, exc: PermissionError):
-    return JSONResponse(status_code=403, content={"detail": str(exc)})
+    return JSONResponse(status_code=403, content={"detail": "Access denied"})
 
 
 # ---------------------------------------------------------------------------
@@ -517,7 +517,7 @@ GLOBAL_SKILL_DIRS = (".agents/skills", ".cptr/skills", ".claude/skills", ".codex
 
 
 async def _list_skills_in_dir(fs: UserFS, root: str, scope: str) -> list[SkillSummary]:
-    if not await fs.isdir(root):
+    if not fs.is_path_allowed(root) or not await fs.isdir(root):
         return []
 
     skills: list[SkillSummary] = []
@@ -527,7 +527,7 @@ async def _list_skills_in_dir(fs: UserFS, root: str, scope: str) -> list[SkillSu
             continue
         skill_dir = join_skill_path(root, dirname)
         skill_path = join_skill_path(skill_dir, "SKILL.md")
-        if not await fs.isfile(skill_path):
+        if not fs.is_path_allowed(skill_path) or not await fs.isfile(skill_path):
             continue
         frontmatter, _ = parse_skill_frontmatter(await fs.read_text(skill_path))
         description = (frontmatter.get("description") or "").strip()
@@ -585,6 +585,7 @@ async def set_cwd(
 ):
     session_id = http_request.headers.get("x-session-id")
     target = fs.resolve_path(request.path)
+    target = fs.require_path(target)
     if not await fs.isdir(target):
         raise HTTPException(status_code=404, detail="Directory not found")
     _set_session_cwd(session_id, target, fs)
@@ -705,10 +706,10 @@ async def read_file(
     session_id = http_request.headers.get("x-session-id")
     session_cwd = _get_session_cwd(session_id, fs) if session_id else None
     target = fs.resolve_path(path, cwd=session_cwd)
+    target = fs.require_path(target)
     if not await fs.isfile(target):
         raise HTTPException(status_code=404, detail="File not found")
 
-    fs._check_path(target)
     try:
         return await text_file_response(target, target, start_line, end_line)
     except UnicodeDecodeError:
@@ -764,6 +765,7 @@ async def display_file(
     session_id = http_request.headers.get("x-session-id")
     session_cwd = _get_session_cwd(session_id, fs) if session_id else None
     target = fs.resolve_path(path, cwd=session_cwd)
+    target = fs.require_path(target)
     exists = await fs.isfile(target)
     return {"path": target, "exists": exists}
 
@@ -784,6 +786,7 @@ async def view_file(
     binary types), this endpoint serves any file as-is for UI previewing.
     """
     target = fs.resolve_path(path)
+    target = fs.require_path(target)
     if not await fs.isfile(target):
         raise HTTPException(status_code=404, detail="File not found")
 
@@ -791,8 +794,9 @@ async def view_file(
         ext = os.path.splitext(target)[1].lower()
         if ext in (".docx", ".pptx"):
             try:
-                fs._check_path(target)
                 pdf = await _preview_pdf(target)
+            except PermissionError:
+                raise
             except Exception:
                 log.exception("Rendered preview failed for %s", target)
                 pdf = None
@@ -804,7 +808,6 @@ async def view_file(
 
     mime, _ = mimetypes.guess_type(target)
     mime = mime or "application/octet-stream"
-    fs._check_path(target)
     return FileResponse(target, media_type=mime)
 
 
@@ -832,10 +835,13 @@ async def write_file(http_request: Request, request: WriteRequest, fs: UserFS = 
     session_id = http_request.headers.get("x-session-id")
     session_cwd = _get_session_cwd(session_id, fs) if session_id else None
     target = fs.resolve_path(request.path, cwd=session_cwd)
+    target = fs.require_path(target, write=True)
     try:
         await fs.write(target, request.content)
+    except PermissionError:
+        raise
     except (OSError, subprocess.CalledProcessError) as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail="Unable to write file") from e
     return {"path": target, "size": len(request.content.encode())}
 
 
@@ -846,10 +852,13 @@ async def write_file(http_request: Request, request: WriteRequest, fs: UserFS = 
 )
 async def mkdir(request: MkdirRequest, fs: UserFS = Depends(get_filesystem)):
     target = fs.resolve_path(request.path)
+    target = fs.require_path(target, write=True)
     try:
         await fs.mkdir(target)
+    except PermissionError:
+        raise
     except (OSError, subprocess.CalledProcessError) as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail="Unable to create directory") from e
     return {"path": target}
 
 
@@ -863,13 +872,17 @@ async def delete_entry(
     fs: UserFS = Depends(get_filesystem),
 ):
     target = fs.resolve_path(path)
+    # Keep the final link entry for unlink; authorize its target before probes.
+    fs.require_path(target, write=True)
     if not await fs.exists(target):
         raise HTTPException(status_code=404, detail="Path not found")
     is_dir = await fs.isdir(target)
     try:
         await fs.remove(target)
+    except PermissionError:
+        raise
     except (OSError, subprocess.CalledProcessError) as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail="Unable to delete path") from e
     return {"path": target, "type": "directory" if is_dir else "file"}
 
 
@@ -881,6 +894,9 @@ async def delete_entry(
 async def move_entry(request: MoveRequest, fs: UserFS = Depends(get_filesystem)):
     source = fs.resolve_path(request.source)
     destination = fs.resolve_path(request.destination)
+    # Authorize both original entries before checking either one's existence.
+    fs.require_path(source, write=True)
+    fs.require_path(destination, write=True)
 
     if not await fs.exists(source):
         raise HTTPException(status_code=404, detail="Source path not found")
@@ -894,8 +910,12 @@ async def move_entry(request: MoveRequest, fs: UserFS = Depends(get_filesystem))
 
     try:
         await fs.move(source, destination)
+    except PermissionError:
+        raise
+    except FileExistsError:
+        raise HTTPException(status_code=409, detail="Destination already exists")
     except (OSError, subprocess.CalledProcessError) as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail="Unable to move path") from e
     return {"source": source, "destination": destination}
 
 
@@ -915,13 +935,16 @@ async def replace_file_content(http_request: Request, request: ReplaceRequest, f
     session_id = http_request.headers.get("x-session-id")
     session_cwd = _get_session_cwd(session_id, fs) if session_id else None
     target = fs.resolve_path(request.path, cwd=session_cwd)
+    target = fs.require_path(target, write=True)
     if not await fs.isfile(target):
         raise HTTPException(status_code=404, detail="File not found")
 
     try:
         content = await fs.read_text(target)
+    except PermissionError:
+        raise
     except OSError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail="Unable to read file") from e
 
     for chunk in request.replacements:
         if chunk.start_line or chunk.end_line:
@@ -950,8 +973,10 @@ async def replace_file_content(http_request: Request, request: ReplaceRequest, f
 
     try:
         await fs.write(target, content)
+    except PermissionError:
+        raise
     except OSError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail="Unable to write file") from e
 
     return {"path": target, "size": len(content.encode())}
 
@@ -992,6 +1017,7 @@ async def grep_search(
     session_id = http_request.headers.get("x-session-id")
     session_cwd = _get_session_cwd(session_id, fs) if session_id else None
     target = fs.resolve_path(path, cwd=session_cwd)
+    target = fs.require_path(target)
     if not await aiofiles.os.path.exists(target):
         raise HTTPException(status_code=404, detail="Search path not found")
 
@@ -1018,7 +1044,8 @@ async def grep_search(
             if truncated:
                 return
             try:
-                with open(file_path, "r", encoding="utf-8", errors="strict") as f:
+                canonical = fs.require_path(file_path)
+                with open(canonical, "r", encoding="utf-8", errors="strict") as f:
                     for line_number, line in enumerate(f, 1):
                         if pattern.search(line):
                             if match_per_line:
@@ -1043,20 +1070,10 @@ async def grep_search(
         if os.path.isfile(target):
             _search_file(target)
         else:
-            for dirpath, dirnames, filenames in os.walk(target):
-                # Prune directories belonging to other users.
-                dirnames[:] = [
-                    d for d in dirnames
-                    if fs.is_path_allowed(os.path.join(dirpath, d))
-                ]
+            for full, entry_type in walk_entries(fs, target):
                 if truncated:
                     break
-                for filename in sorted(filenames):
-                    if not _matches_include(filename):
-                        continue
-                    full = os.path.join(dirpath, filename)
-                    if not fs.is_path_allowed(full):
-                        continue
+                if entry_type == "file" and _matches_include(os.path.basename(full)):
                     _search_file(full)
 
         return matches, truncated
@@ -1103,14 +1120,15 @@ async def match_files(
     session_id = http_request.headers.get("x-session-id")
     session_cwd = _get_session_cwd(session_id, fs) if session_id else None
     target = fs.resolve_path(path, cwd=session_cwd)
-    if not fs.is_path_allowed(target) or not await aiofiles.os.path.isdir(target):
+    target = fs.require_path(target)
+    if not await aiofiles.os.path.isdir(target):
         raise HTTPException(status_code=404, detail="Search directory not found")
 
     def _matches_sync():
         query_lower = query.lower()
 
         def content_lines(path):
-            with open(path, encoding="utf-8", errors="replace", newline="\n" if rg_matches is not None else None) as source:
+            with open(fs.require_path(path), encoding="utf-8", errors="replace", newline="\n" if rg_matches is not None else None) as source:
                 if rg_matches is not None:
                     yield from enumerate(source, 1)
                     return
@@ -1130,10 +1148,11 @@ async def match_files(
                 content_matches = []
                 if entry_type == "file" and not os.path.islink(entry_path):
                     try:
-                        size = os.path.getsize(entry_path)
+                        canonical = fs.require_path(entry_path)
+                        size = os.path.getsize(canonical)
                         eligible = rg_matches(entry_path) if rg_matches is not None else size <= MAX_CONTENT_SEARCH_FILE_SIZE
                         if eligible:
-                            with open(entry_path, "rb") as source:
+                            with open(canonical, "rb") as source:
                                 binary = rg_matches is None and b"\0" in source.read(8192)
                             for number, text in (() if binary else content_lines(entry_path)):
                                 index = text.lower().find(query_lower)
@@ -1150,7 +1169,7 @@ async def match_files(
                     "type": entry_type, "name_match": score < 4, "content_matches": content_matches,
                 })
 
-        with matching_files(query, target, show_hidden) as rg_matches:
+        with matching_files(query, target, show_hidden, fs=fs) as rg_matches:
             return ranked_page(candidates(), offset, limit)
 
     return await run_io(_matches_sync)
@@ -1183,7 +1202,8 @@ async def search_files(
     session_id = http_request.headers.get("x-session-id")
     session_cwd = _get_session_cwd(session_id, fs) if session_id else None
     target = fs.resolve_path(path, cwd=session_cwd)
-    if not fs.is_path_allowed(target) or not await aiofiles.os.path.isdir(target):
+    target = fs.require_path(target)
+    if not await aiofiles.os.path.isdir(target):
         raise HTTPException(status_code=404, detail="Search directory not found")
 
     def _search_sync():
@@ -1198,7 +1218,7 @@ async def search_files(
                     continue
                 rank = 0 if lower == query_lower else 1 if lower.startswith(query_lower) else 2
                 try:
-                    info = os.stat(full_path)
+                    info = os.stat(fs.require_path(full_path))
                 except OSError:
                     continue
                 yield (rank, len(name), os.path.relpath(full_path, target).lower(), {
@@ -1240,6 +1260,7 @@ async def glob_search(
     session_id = http_request.headers.get("x-session-id")
     session_cwd = _get_session_cwd(session_id, fs) if session_id else None
     target = fs.resolve_path(path, cwd=session_cwd)
+    target = fs.require_path(target)
     if not await aiofiles.os.path.isdir(target):
         raise HTTPException(status_code=404, detail="Search directory not found")
 
@@ -1247,58 +1268,27 @@ async def glob_search(
         matches = []
         truncated = False
 
-        for dirpath, dirnames, filenames in os.walk(target):
+        for full_path, entry_type in walk_entries(fs, target):
             if truncated:
                 break
-
-            # Prune directories belonging to other users.
-            dirnames[:] = [
-                d for d in dirnames
-                if fs.is_path_allowed(os.path.join(dirpath, d))
-            ]
-
-            entries = []
-            if type in ("any", "directory"):
-                entries.extend([(d, "directory") for d in dirnames])
-            if type in ("any", "file"):
-                entries.extend([(f, "file") for f in filenames])
-
-            for name, entry_type in sorted(entries, key=lambda x: x[0]):
-                if truncated:
-                    break
-
-                full_path = os.path.join(dirpath, name)
-                rel_path = os.path.relpath(full_path, target)
-
-                # Check inclusion pattern
-                if not fnmatch.fnmatch(name, pattern) and not fnmatch.fnmatch(
-                    rel_path, pattern
-                ):
-                    continue
-
-                # Check exclusion patterns
-                if exclude and any(
-                    fnmatch.fnmatch(name, excl) or fnmatch.fnmatch(rel_path, excl)
-                    for excl in exclude
-                ):
-                    continue
-
-                try:
-                    file_stat = os.stat(full_path)
-                    matches.append(
-                        {
-                            "path": rel_path,
-                            "type": entry_type,
-                            "size": file_stat.st_size,
-                            "modified": file_stat.st_mtime,
-                        }
-                    )
-
-                    if len(matches) >= max_results:
-                        truncated = True
-                        break
-                except OSError:
-                    pass
+            if type != "any" and type != entry_type:
+                continue
+            name = os.path.basename(full_path)
+            rel_path = os.path.relpath(full_path, target)
+            if not fnmatch.fnmatch(name, pattern) and not fnmatch.fnmatch(rel_path, pattern):
+                continue
+            if exclude and any(fnmatch.fnmatch(name, excl) or fnmatch.fnmatch(rel_path, excl) for excl in exclude):
+                continue
+            try:
+                file_stat = os.stat(fs.require_path(full_path))
+                matches.append({
+                    "path": rel_path, "type": entry_type,
+                    "size": file_stat.st_size, "modified": file_stat.st_mtime,
+                })
+                if len(matches) >= max_results:
+                    truncated = True
+            except OSError:
+                pass
 
         return matches, truncated
 
@@ -1361,22 +1351,21 @@ async def upload_file(
     except BaseException:
         await form.close()
         raise
-    filename = os.path.basename(file.filename or "upload")
-    directory = fs.resolve_path(directory)
-    path = os.path.normpath(os.path.join(directory, filename))
     size = 0
     try:
-        fs._check_path(path)
+        filename = os.path.basename(file.filename or "upload")
+        directory = fs.require_path(fs.resolve_path(directory), write=True)
+        path = fs.require_path(os.path.join(directory, filename), write=True)
         await fs.mkdir(directory)
         async with aiofiles.open(path, "wb") as output:
             while chunk := await file.read(CHUNK_SIZE):
                 size += len(chunk)
                 await output.write(chunk)
         await fs._chown(path)
-    except PermissionError as exc:
-        raise HTTPException(403, str(exc))
+    except PermissionError:
+        raise
     except OSError as exc:
-        raise HTTPException(400, str(exc))
+        raise HTTPException(400, "Unable to upload file") from exc
     finally:
         await form.close()
     return {"path": path, "size": size}
@@ -1404,12 +1393,11 @@ async def archive_paths(
     if not request.paths:
         raise HTTPException(status_code=400, detail="No paths provided")
 
-    resolved = []
-    for p in request.paths:
-        target = fs.resolve_path(p)
+    # Reject the entire explicit list before existence checks or ZIP creation.
+    resolved = [fs.require_path(fs.resolve_path(p)) for p in request.paths]
+    for target in resolved:
         if not await fs.exists(target):
-            raise HTTPException(status_code=404, detail=f"Path not found: {p}")
-        resolved.append(target)
+            raise HTTPException(status_code=404, detail="Path not found")
 
     # Derive a meaningful archive name from the input paths.
     if len(resolved) == 1:
@@ -1425,24 +1413,21 @@ async def archive_paths(
         if os.path.isfile(target):
             yield target
         elif os.path.isdir(target):
-            for directory, dirs, files in os.walk(target):
-                dirs[:] = [name for name in dirs if fs.is_path_allowed(os.path.join(directory, name))]
-                for name in files:
-                    full = os.path.join(directory, name)
-                    if fs.is_path_allowed(full):
-                        yield full
+            for full, entry_type in walk_entries(fs, target):
+                if entry_type == "file":
+                    yield full
 
     def _build_zip():
         with zipfile.ZipFile(temporary, "w", zipfile.ZIP_DEFLATED) as archive:
             for target in resolved:
-                fs._check_path(target)
                 for full in archive_files(target):
                     if stop.is_set():
                         return
                     arcname = os.path.basename(full) if full == target else os.path.join(os.path.basename(target.rstrip("/\\")) or "dir", os.path.relpath(full, target))
-                    info = zipfile.ZipInfo.from_file(full, arcname)
+                    canonical = fs.require_path(full)
+                    info = zipfile.ZipInfo.from_file(canonical, arcname)
                     info.compress_type = zipfile.ZIP_DEFLATED
-                    with open(full, "rb") as source, archive.open(info, "w") as destination:
+                    with open(canonical, "rb") as source, archive.open(info, "w") as destination:
                         while chunk := source.read(CHUNK_SIZE):
                             if stop.is_set():
                                 return
@@ -1451,7 +1436,7 @@ async def archive_paths(
     task = asyncio.create_task(asyncio.to_thread(_build_zip))
     try:
         await asyncio.shield(task)
-        return TemporaryFileResponse(temporary, media_type="application/zip", headers={"Content-Disposition": f'attachment; filename="{archive_name}.zip"'})
+        return TemporaryFileResponse(temporary, media_type="application/zip", filename=f"{archive_name}.zip")
     except BaseException:
         stop.set()
         await asyncio.gather(task, return_exceptions=True)

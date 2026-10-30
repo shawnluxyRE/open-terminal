@@ -114,6 +114,10 @@ def extract(path):
             )
         lines = text.splitlines()
         return {"path": path, "name": name, "notices": notices}, lines
+    except PermissionError:
+        # Keep the error category across the worker boundary. Filename and
+        # OS exception text must not become a document-validation response.
+        raise
     except Exception as exc:
         raise ValueError(f"{name}: {exc}") from exc
 
@@ -206,18 +210,15 @@ def compare(original, revised, ignore_whitespace=False):
 
 
 async def run_comparison(request, payload, fs, cwd=None):
-    paths = []
-    for path in (payload.original, payload.revised):
-        target = fs.resolve_path(path, cwd=cwd)
-        try:
-            fs._check_path(target)
-            target = os.path.realpath(target)
-            fs._check_path(target)
+    # Check every explicit input before probing either file or starting work.
+    try:
+        paths = [fs.require_path(fs.resolve_path(path, cwd=cwd))
+                 for path in (payload.original, payload.revised)]
+        for target in paths:
             if not await fs.isfile(target):
-                raise HTTPException(404, f"{Path(path).name}: File not found.")
-        except PermissionError as exc:
-            raise HTTPException(403, f"{Path(path).name}: Access denied.") from exc
-        paths.append(target)
+                raise HTTPException(404, "File not found.")
+    except PermissionError as exc:
+        raise HTTPException(403, "Access denied") from exc
     command = [sys.executable, "-m", "open_terminal.utils.file_compare"]
     process_options = {}
     if fs.username:
@@ -247,6 +248,8 @@ async def run_comparison(request, payload, fs, cwd=None):
         raise HTTPException(exc.status_code, messages.get(exc.status_code, exc.detail)) from exc
     result = json.loads(stdout)
     if "error" in result:
+        if result.get("error_type") == "PermissionError":
+            raise HTTPException(403, "Access denied")
         raise HTTPException(422, result["error"])
     return result
 
@@ -254,6 +257,8 @@ async def run_comparison(request, payload, fs, cwd=None):
 if __name__ == "__main__":
     try:
         result = compare(**json.load(sys.stdin))
+    except PermissionError:
+        result = {"error": "Access denied", "error_type": "PermissionError"}
     except Exception as exc:
         result = {"error": str(exc)}
     json.dump(result, sys.stdout)
