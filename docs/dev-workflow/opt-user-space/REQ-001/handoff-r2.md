@@ -2,15 +2,70 @@
 
 - stage：`R2`
 - result：`ready`
-- next_role：`R0`
-- 修订：v1.3，2026-10-29；用户直接要求精简业务接口注释，契约沿用 v1.2；当前已存在 R4 实现及 R5 验收，本轮仅维护注释。
+- next_role：`R3`
+- 修订：v1.4，2026-11-02；用户直接授权 R2-PERF-001 性能与并发设计修订，业务实现留给R4。
 - work_dir：`D:\Documents\synowave\WebUI\open-terminal\docs\dev-workflow\opt-user-space`
 - req_dir：`D:\Documents\synowave\WebUI\open-terminal\docs\dev-workflow\opt-user-space\REQ-001`
 - 需求依据：[requirements.md](../requirements.md) v1.10，REQ-001 / AC-001～004、AC-032～033，关联 REQ-007 / AC-023、AC-034 的恢复契约；既有 D01～D11 不变。
-- 工作分支：`code/opt-req001`，从实际 `codex/opt` 创建；设计起始 HEAD `6c1554d9ce67d6f3c9f6e03710acb620bbcc33ba`，业务源码基线 `3994f0939b6535d68ff2bd7c082c2a274e133e42` / 0.14.5。
-- 本轮交回用户/R0，不创建或推进其他对话；已有 R3～R5 流程不回退。ready 表示注释修订可交付，当前实现和验收结论以各阶段交接为准。
+- 本轮分支：`codex/opt-req001-fix`，从 `codex/opt-req001` / `59eac68b4c0314ab633c376de82a539af3c98d52` 创建并已切换；Open Terminal 0.14.5。历史设计起点和证据保留于下文，不与本轮基线混用。
+- 接收角色R3：先更新既有计划，再由R4实现、R5复验；本轮未推进其他对话。ready表示修订设计和测试可交接，不表示性能问题已修复，原R4/R5历史结论保持原样。
 
-## v1.3 注释精简（本轮）
+## v1.4 R2-PERF-001：后台准备、就绪快路径与分层锁
+
+### 问题与处理结论
+
+已确认59eac68中已有用户仍同步等待全局准备锁，重复读取/刷盘/扫描NSS并执行chmod；异步命令、建终端和端口/代理入口直接调用同步准备，慢初始化会阻塞同worker事件循环。本轮采用用户指定方案，继续保留完整ID归属、短名随机避碰、UID/GID范围、错误响应和R5-001持久化边界。
+
+- 后台入口：新增 `get_filesystem_async(Request) -> UserFS` 骨架，R4用工作线程复用原同步准备与错误转译，接入三个手动准备位置；既有同步依赖、元数据和任务/终端控制策略保持。
+- 分层锁：每用户线程/文件锁串行同用户准备；全局锁只做最新清单核验、预留与原子合并提交；慢NSS/系统命令在全局锁外。每次提交核对本用户预期旧记录，并合入最新清单，避免覆盖其他用户提交。
+- 就绪快路径：跨实例共享进程内缓存，只缓存已确认持久化且当前服务访问正常的ready绑定。稳定命中不重读整份JSON、不fsync、不全扫NSS、不执行特权命令；版本、配置、NSS/home/权限、PID等变化均触发核验，不能用TTL或旧内存覆盖新证据。
+- 持久性：B发布可见但目录fsync失败的新版本时，A旧缓存必须失配；在短全局事务确认新版本前不能成功。正常慢OS准备可独立推进，必要持久化屏障不能被“性能优化”绕过。
+- Agent功能：保留所有旧测试和成功协议；新用例实际检查慢准备期间健康、任务列表和已连接PTY的新输入输出仍可完成。无旧目录迁移、配额或命令限制范围扩展。
+
+详细状态、锁顺序、缓存观察边界、NSS回退条件及性能判定见[模块设计v1.4](../../../design/workspace-identity.md)。当前标准镜像的NSS配置实际为 `files systemd`，R4须验证账户来源和变化观察；不可简单禁用整个标准镜像快路径，也不可忽略额外可变来源。
+
+### 本轮产物
+
+| 产物 | 内容 |
+| --- | --- |
+| [workspace-identity.md](../../../design/workspace-identity.md) v1.4 | 一张UML核心接口图，后台准备、短全局事务、用户锁、快缓存及性能/并发契约。 |
+| [dependencies.py](../../../../open_terminal/dependencies.py) | 新异步入口有完整简洁注释，函数体仅NotImplementedError，尚未接线。 |
+| [user_isolation.py](../../../../open_terminal/utils/user_isolation.py) | 更新准备器目标契约注释；原业务实现不改。新注释不写需求/验收编号。 |
+| [test_agent_responsiveness.py](../../../../tests/req001/test_agent_responsiveness.py) | 6项：4类实际HTTP入口与同worker真实PTY响应，2项新异步接口正确返回/身份错误。 |
+| [test_workspace_concurrency.py](../../../../tests/req001/test_workspace_concurrency.py) | 5项：ready/新用户独立进展、同用户等待、跨进程进展和提交合并。 |
+| [test_workspace_cache_durability.py](../../../../tests/req001/test_workspace_cache_durability.py) | 3项：另一用户planned/group_ready/ready发布后fsync失败时，已预热用户不能绕过持久化。 |
+| [test_workspace_fast_path.py](../../../../tests/req001/test_workspace_fast_path.py) | 4项：100次预热性能观测、坏清单替换失效、home权限变化、fork后独立确认。 |
+
+### 本轮验证证据
+
+所有编辑及Git操作在Windows；WSL Ubuntu-24.04只构建、运行和测试。使用固定REQ-001原基线镜像构建新的独立测试镜像，避免当前部署可能含其他需求的源码影响判定：
+
+```bash
+cd ~/projects/webui/open-terminal
+docker build --network host \
+  --build-arg http_proxy --build-arg https_proxy --build-arg no_proxy \
+  --build-arg BASE_IMAGE=webui-lab/open-terminal:req001-r4-base \
+  -f tests/req001/Dockerfile -t webui-lab/open-terminal:req001-fix-r2-tests .
+docker run --rm --network none webui-lab/open-terminal:req001-fix-r2-tests \
+  tests/req001 -q -p no:cacheprovider --tb=short
+```
+
+- 最终测试镜像：`sha256:b8a9acd7773cc4038370815151f8e18a947a51a23ca5f4300fea4505239f6699`。基础 `req001-r4-base` 为 `sha256:1603db9c88492ac7d1e224799b3dd3e68692db4d6b2e5d3fb124ad842c9a69dd`。见[构建日志](evidence/r2-perf-001-build.txt)。
+- 最终全量 **407项，396 passed、11 failed、6 warnings，98.60秒，退出1**，见[完整输出](evidence/r2-perf-001-pytest.txt)。原有389项全部通过；新增18项中7通过、11失败。没有导入/收集/fixture错误、skip或xfail。
+- 11项红基线分类：2项异步骨架未实现；4项实际命令/终端/端口/代理请求阻塞同worker；4项跨用户线程/进程进展被长全局锁阻塞；1项稳定暖路径重复执行重活。这些是R4待实现的目标，不通过改断言放行。
+- 7项新增通过：同用户等待不返回半成品1项、跨用户未确认版本持续故障保护3项、坏清单失效/home权限修复/fork独立确认3项。它们保护性能改造不能削弱原归属与持久性。
+- 暖路径100次当前测量：p50 **2.639ms**、p95 **3.927ms**；观察到清单open/load各100次、目录fsync100次、passwd全扫200次、group全扫100次、特权命令100次。它说明重复准备仍存在，不是新快路径的性能结果；分位数含本轮观测开销，不当作端到端Agent延迟或跨机器SLA。
+- [源码/测试保留校验](evidence/r2-perf-001-source-audit.json)：与59eac68比较，4个业务模块的既有AST在去除docstring和唯一新增异步stub后完全一致；14个原有测试/配置文件内容保持。校验脚本及基线输入均在同一evidence目录，Windows保存、Docker只读解析。
+- 新测试先定向运行，修正了测试临时目录父级不可穿越导致命令cd失败的环境问题；最终仅临时目录补search权限并恢复。交叉审阅后将独立进展/watchdog防挂死上限放宽至5秒，并补充io.open/os.open/json.load/loads观测，防止暖路径读取清单绕过计数。以上最终全量输出为当前基线，初轮[定向输出](evidence/r2-perf-001-targeted.txt)只作过程记录。
+- 警告为既有Starlette/httpx及真实PTY路径的datetime.utcnow弃用提示，不影响判定。本轮未为此修改依赖或业务代码。
+
+测试容器为一次性root容器，无宿主/生产数据卷挂载、不发布端口、禁用网络，结束自动删除；真实PTY、线程/进程均有清理。未读取部署凭据，未改Open WebUI、部署配置、运行服务或原两个持久卷。`evidence/`已由现有.gitignore忽略，无新增忽略规则。没有Git提交、推送或新建其他角色对话。
+
+### 本轮下一步
+
+**接收角色：R3。处理结论：R2-PERF-001设计与测试ready，业务修复待实现。** 请更新本需求既有`plan.md`与R3交接，安排后台接入、缓存/锁/合并提交、原389项回归及18项新用例，并要求同机新旧暖路径/并发比较；随后由用户指令R4实现和R5复验。不得把旧R5通过结论当作本轮性能契约已验收，也不另起一份重复需求记录。
+
+## v1.3 注释精简（历史记录）
 
 - 修改范围：`identity.py`、`dependencies.py`、`user_isolation.py` 中12处docstring，由211行减为69行；最长的 `WorkspaceProvisioner.resolve` 由57行减为11行。
 - 保留职责、输入/输出、身份原样校验、短名规则、UID/GID范围、持久绑定与关键异常。重复的接入流程、状态表、存储细节、概率分析及多个例子由[模块设计](../../../design/workspace-identity.md)承载；具体行为契约不变。

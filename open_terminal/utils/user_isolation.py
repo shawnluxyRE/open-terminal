@@ -23,6 +23,7 @@ import time
 from collections.abc import Collection
 from contextlib import contextmanager
 from contextvars import ContextVar
+from dataclasses import dataclass
 
 from open_terminal.utils.identity import (
     InvalidUserIdentity,
@@ -40,7 +41,103 @@ _PREPARATION_TIMEOUT = 30.0
 _COMMAND_TIMEOUT = 30.0
 _thread_locks: dict[str, threading.Lock] = {}
 _thread_locks_guard = threading.Lock()
+_cache_guard = threading.Lock()
+_ready_cache: dict[tuple, "_ReadyEntry"] = {}
+_descriptor_guard = threading.Lock()
+_access_guard = threading.Lock()
+_lock_descriptors: set[int] = set()
+_process_pid = os.getpid()
 _operation: ContextVar[tuple[str, str] | None] = ContextVar("workspace_operation", default=None)
+
+
+@dataclass(frozen=True)
+class _ReadyEntry:
+    account: WorkspaceAccount
+    record: dict
+    registry_version: tuple
+    observation: tuple
+
+
+class _LockBudget:
+    """One waiting budget across all user and registry lock acquisitions."""
+
+    def __init__(self):
+        self.remaining = _PREPARATION_TIMEOUT
+
+    @contextmanager
+    def waiting(self):
+        if self.remaining <= 0:
+            raise WorkspaceProvisionError("workspace_busy")
+        start = time.monotonic()
+        try:
+            yield
+        finally:
+            self.remaining -= time.monotonic() - start
+
+
+def _reset_after_fork() -> None:
+    global _thread_locks, _thread_locks_guard, _cache_guard, _ready_cache
+    global _descriptor_guard, _access_guard, _lock_descriptors, _process_pid
+    # Close only this child's inherited references; never LOCK_UN a descriptor
+    # shared with the parent, which would release the parent's real file lock.
+    for descriptor in _lock_descriptors:
+        try:
+            os.close(descriptor)
+        except OSError:
+            pass
+    _thread_locks = {}
+    _thread_locks_guard = threading.Lock()
+    _cache_guard = threading.Lock()
+    _ready_cache = {}
+    _descriptor_guard = threading.Lock()
+    _access_guard = threading.Lock()
+    _lock_descriptors = set()
+    _process_pid = os.getpid()
+
+
+os.register_at_fork(
+    before=lambda: _descriptor_guard.acquire(),
+    after_in_parent=lambda: _descriptor_guard.release(),
+    after_in_child=_reset_after_fork,
+)
+
+
+def _file_version(path: str) -> tuple | None:
+    try:
+        info = os.lstat(path)
+    except FileNotFoundError:
+        return None
+    return (
+        info.st_dev, info.st_ino, info.st_mode, info.st_uid, info.st_gid,
+        info.st_size, info.st_mtime_ns, info.st_ctime_ns,
+    )
+
+
+_NSS_FILES = ("/etc/passwd", "/etc/group", "/etc/nsswitch.conf")
+_EXTRA_NSS_SOURCES = (
+    "/etc/userdb", "/run/userdb", "/run/host/userdb", "/usr/lib/userdb",
+    "/run/systemd/userdb", "/run/systemd/dynamic-uid", "/run/dbus/system_bus_socket",
+)
+
+
+def _nss_observation() -> tuple:
+    return tuple(_file_version(path) for path in (*_NSS_FILES, *_EXTRA_NSS_SOURCES))
+
+
+def _local_nss_is_observable(observation: tuple) -> bool:
+    # The standard container uses files systemd without userdb providers or
+    # dynamic-user facilities. Their appearance invalidates every local proof.
+    if any(version is not None for version in observation[len(_NSS_FILES):]):
+        return False
+    if any(version is None or not stat.S_ISREG(version[2]) for version in observation[:len(_NSS_FILES)]):
+        return False
+    with open("/etc/nsswitch.conf", encoding="utf-8") as source:
+        entries = {}
+        for line in source:
+            key, separator, values = line.partition("#")[0].partition(":")
+            if separator and key.strip() in ("passwd", "group"):
+                entries[key.strip()] = values.split()
+    return all(entries.get(key) in (["files"], ["files", "systemd"]) for key in ("passwd", "group"))
 
 
 def _step(name: str) -> None:
@@ -106,7 +203,7 @@ def allocate_workspace_ids(
 class WorkspaceProvisioner:
     """Prepare and verify persistent full-ID bindings to Linux workspaces.
 
-    State transitions and failure rules: docs/design/workspace-identity.md.
+    Cache, lock and recovery contracts: docs/design/workspace-identity.md.
     """
 
     def __init__(
@@ -129,14 +226,14 @@ class WorkspaceProvisioner:
     def resolve(self, user_id: str) -> WorkspaceAccount:
         """Return a ready workspace for the exact ID, creating or restoring it.
 
-        Validate before I/O; serialize ownership checks and preparation under locks.
-        For new users, try the hash name then up to 32 random candidates; persist the
-        binding before OS creation. Reuse saved names on retry/rebuild; never rename
-        to bypass a conflicting binding. New UID/GID values stay in 10001..19999;
-        verified existing accounts retain their IDs, including out-of-range values.
-        Return only after home ownership/permissions and server access are ready.
-        InvalidUserIdentity or WorkspaceProvisionError leaves user data intact and
-        never falls back to a shared account. State/error details are in the design.
+        Validate before I/O. The fast path reuses only durable, unchanged
+        bindings after lightweight ownership/access checks. Slow preparation uses
+        a per-user lock; global locks cover short registry transactions only.
+        Each commit merges the user's transition into the latest valid registry.
+        Persist reservations before OS work; publish cache entries only after
+        durable ready and usable access. Reuse names on retry, never on conflict.
+        InvalidUserIdentity or WorkspaceProvisionError preserves user data with
+        no shared-account fallback. Detailed limits and invalidation: design doc.
         """
         validate_user_id(user_id)
         self._validate_configuration()
@@ -146,31 +243,47 @@ class WorkspaceProvisioner:
             f"{os.getpid()}:{threading.get_ident()}:{time.monotonic_ns()}".encode()
         ).hexdigest()[:16]
         token = _operation.set((operation_id, "service_account"))
+        cache_key = self._cache_key(user_id)
         try:
             server = pwd.getpwuid(os.getuid())
-            with self._locked(server):
-                registry = self._load_registry(server)
-                users = registry["users"]
-                record = users.get(user_id)
-                if record is None:
-                    name = self._choose_name(user_id, users)
-                    uid, gid = self._allocate(users)
-                    record = {
-                        "username": name,
-                        "prefix": self.username_prefix,
-                        "home": os.path.join(self.home_root, name),
-                        "uid": uid,
-                        "gid": gid,
-                        "state": "planned",
-                    }
-                    users[user_id] = record
-                    self._save_registry(registry)
-                return self._prepare(user_id, record, registry, server)
+            hit = self._cached_account(cache_key, server)
+            if hit is not None:
+                return hit
+            budget = _LockBudget()
+            self._ensure_metadata(server)
+            lock_name = hashlib.sha256(user_id.encode("utf-8")).hexdigest() + ".lock"
+            with self._locked(server, budget, os.path.join("user-locks", lock_name)):
+                snapshot = self._nss_snapshot()
+                with self._locked(server, budget):
+                    registry, _ = self._load_registry(server)
+                    record = registry["users"].get(user_id)
+                    if record is None:
+                        name = self._choose_name(user_id, registry["users"], snapshot)
+                        uid, gid = self._allocate(registry["users"], snapshot)
+                        record = {
+                            "username": name, "prefix": self.username_prefix,
+                            "home": os.path.join(self.home_root, name),
+                            "uid": uid, "gid": gid, "state": "planned",
+                        }
+                        registry["users"][user_id] = record
+                        self._save_registry(registry)
+                    record = dict(record)
+                account, record = self._prepare(user_id, record, server, budget)
+                entry = self._confirm_ready(account, record, server, budget)
+            # Cache mutexes never enclose I/O or nest inside either disk lock.
+            if entry is not None:
+                with _cache_guard:
+                    _ready_cache[cache_key] = entry
+            return account
         except WorkspaceProvisionError as exc:
+            with _cache_guard:
+                _ready_cache.pop(cache_key, None)
             _, step = _operation.get()
             log.warning("Workspace preparation rejected: operation=%s step=%s code=%s", operation_id, step, exc.code)
             raise
         except Exception as exc:
+            with _cache_guard:
+                _ready_cache.pop(cache_key, None)
             # Privileged stderr and persistent user data must not enter a public
             # diagnostic (or an unrestricted traceback in the service log).
             _, step = _operation.get()
@@ -178,6 +291,113 @@ class WorkspaceProvisioner:
             raise WorkspaceProvisionError("workspace_unavailable") from None
         finally:
             _operation.reset(token)
+
+    def _cache_key(self, identity: str) -> tuple:
+        if _process_pid != os.getpid():
+            _reset_after_fork()
+        return (
+            os.path.realpath(self.state_dir), self.home_root, self.username_prefix,
+            identity, os.getuid(), os.geteuid(), os.getgid(), os.getegid(), os.getpid(),
+        )
+
+    @staticmethod
+    def _node(info) -> tuple:
+        # User writes change directory timestamps, not the ownership of the home.
+        return info.st_dev, info.st_ino, info.st_mode, info.st_uid, info.st_gid
+
+    @classmethod
+    def _observe_docker_access(cls, account: WorkspaceAccount) -> tuple:
+        """Observe optional membership without making it a workspace requirement."""
+        path = "/var/run/docker.sock"
+        try:
+            target = os.stat(path)
+        except FileNotFoundError:
+            return None, True
+        except OSError:
+            return None, False
+        try:
+            # Observe the followed target as well as the link: a stable symlink
+            # can point to a replaced socket or one whose owning GID changes.
+            node = cls._node(os.lstat(path)), cls._node(target)
+            group = grp.getgrgid(target.st_gid)
+            complete = account.gid == group.gr_gid or account.username in group.gr_mem
+            return (node, group.gr_name, group.gr_gid, complete), complete
+        except (OSError, KeyError):
+            return None, False
+
+    def _observe_ready(self, account: WorkspaceAccount, server) -> tuple:
+        home_root = os.lstat(self.home_root)
+        if not stat.S_ISDIR(home_root.st_mode):
+            raise WorkspaceProvisionError("workspace_config_invalid")
+        metadata = []
+        user_lock = hashlib.sha256(account.user_id.encode("utf-8")).hexdigest() + ".lock"
+        for relative, directory in (
+            ("", True), ("user-locks", True), ("provision.lock", False),
+            (os.path.join("user-locks", user_lock), False), ("registry.json", False),
+        ):
+            info = os.lstat(os.path.join(self.state_dir, relative))
+            self._verify_metadata(info, server.pw_uid, directory=directory)
+            metadata.append(self._node(info))
+        version = _file_version(os.path.join(self.state_dir, "registry.json"))
+        sources = _nss_observation()
+        user, group = pwd.getpwnam(account.username), grp.getgrnam(account.username)
+        home = os.lstat(account.home)
+        if (
+            not stat.S_ISDIR(home.st_mode) or stat.S_IMODE(home.st_mode) != 0o2770
+            or (home.st_uid, home.st_gid) != (account.uid, account.gid)
+            or not os.access(account.home, os.R_OK | os.W_OK | os.X_OK)
+        ):
+            raise WorkspaceProvisionError("workspace_unavailable")
+        return (
+            version, tuple(metadata), sources, self._node(home), tuple(user),
+            tuple(group[:3]) + (tuple(group.gr_mem),), tuple(server), self._node(home_root),
+            self._observe_docker_access(account),
+        )
+
+    def _cached_account(self, key: tuple, server) -> WorkspaceAccount | None:
+        with _cache_guard:
+            entry = _ready_cache.get(key)
+        if entry is None:
+            return None
+        try:
+            before = self._observe_ready(entry.account, server)
+            if before == entry.observation and before[0] == entry.registry_version:
+                after = self._observe_ready(entry.account, server)
+                if after == before:
+                    return entry.account
+        except (OSError, KeyError, WorkspaceProvisionError):
+            pass
+        with _cache_guard:
+            if _ready_cache.get(key) is entry:
+                _ready_cache.pop(key, None)
+        return None
+
+    def _confirm_ready(self, account, record, server, budget) -> _ReadyEntry | None:
+        # The version is captured by a confirmed transaction BEFORE the complete
+        # ownership check. Never attach a later stat to an earlier verification.
+        for _ in range(32):
+            with self._locked(server, budget):
+                registry, version = self._load_registry(server)
+                if registry["users"].get(account.user_id) != record or record["state"] != "ready":
+                    raise WorkspaceProvisionError("identity_conflict")
+            before = self._observe_ready(account, server)
+            if before[0] != version:
+                continue
+            self._check_account(pwd.getpwnam(account.username), record, account.user_id)
+            self._check_group(grp.getgrnam(account.username), record, server)
+            after = self._observe_ready(account, server)
+            if before[:-1] != after[:-1]:
+                continue
+            observable = _local_nss_is_observable(after[2])
+            final = self._observe_ready(account, server)
+            if final[:-1] != after[:-1]:
+                continue
+            # Optional failure or a changing socket still permits the verified
+            # workspace. Withhold caching so the next access retries maintenance;
+            # do not turn optional observation churn into a failed core resolve.
+            optional_ready = before[-1] == after[-1] == final[-1] and final[-1][1]
+            return _ReadyEntry(account, dict(record), version, final) if observable and optional_ready else None
+        raise WorkspaceProvisionError("workspace_unavailable")
 
     def _validate_configuration(self) -> None:
         try:
@@ -207,66 +427,70 @@ class WorkspaceProvisioner:
         if not correct_type or info.st_uid != uid or stat.S_IMODE(info.st_mode) != expected_mode:
             raise WorkspaceProvisionError("workspace_state_invalid")
 
-    @contextmanager
-    def _locked(self, server):
-        # All instances in a process use the same lock, and all processes open
-        # the same independent lock inode. Atomic registry replacement is safe.
-        _step("thread_lock")
-        key = os.path.normcase(os.path.abspath(self.state_dir))
-        with _thread_locks_guard:
-            lock = _thread_locks.setdefault(key, threading.Lock())
-        deadline = time.monotonic() + _PREPARATION_TIMEOUT
-        if not lock.acquire(timeout=max(0.0, deadline - time.monotonic())):
-            raise WorkspaceProvisionError("workspace_busy")
-        descriptor = None
-        try:
-            _step("metadata_directory")
-            if not stat.S_ISDIR(os.lstat(self.home_root).st_mode):
-                raise WorkspaceProvisionError("workspace_config_invalid")
-            if not os.path.lexists(self.state_dir):
-                # install makes an initially private directory, also when /home
-                # itself is root-owned. Parallel initializers use identical args.
+    def _ensure_metadata(self, server) -> None:
+        _step("metadata_directory")
+        if not stat.S_ISDIR(os.lstat(self.home_root).st_mode):
+            raise WorkspaceProvisionError("workspace_config_invalid")
+        for directory in (self.state_dir, os.path.join(self.state_dir, "user-locks")):
+            if not os.path.lexists(directory):
                 _run_privileged([
                     "install", "-d", "-m", "0700", "-o", str(server.pw_uid),
-                    "-g", str(server.pw_gid), self.state_dir,
+                    "-g", str(server.pw_gid), directory,
                 ])
-            self._verify_metadata(os.lstat(self.state_dir), server.pw_uid, directory=True)
+            self._verify_metadata(os.lstat(directory), server.pw_uid, directory=True)
+
+    @contextmanager
+    def _locked(self, server, budget, relative="provision.lock"):
+        _step("thread_lock")
+        lock_path = os.path.join(self.state_dir, relative)
+        key = os.path.realpath(lock_path)
+        with _thread_locks_guard:
+            lock = _thread_locks.setdefault(key, threading.Lock())
+        with budget.waiting():
+            if not lock.acquire(timeout=budget.remaining):
+                raise WorkspaceProvisionError("workspace_busy")
+        descriptor = None
+        try:
             _step("file_lock")
-            lock_path = os.path.join(self.state_dir, "provision.lock")
             if os.path.lexists(lock_path):
                 self._verify_metadata(os.lstat(lock_path), server.pw_uid, directory=False)
             flags = os.O_RDWR | os.O_NOFOLLOW | os.O_CLOEXEC
-            try:
-                descriptor = os.open(lock_path, flags | os.O_CREAT | os.O_EXCL, 0o600)
-                os.fchmod(descriptor, 0o600)
-            except FileExistsError:
-                descriptor = os.open(lock_path, flags)
-            self._verify_metadata(os.fstat(descriptor), server.pw_uid, directory=False)
-            while True:
-                if time.monotonic() >= deadline:
-                    raise WorkspaceProvisionError("workspace_busy")
+            with _descriptor_guard:
                 try:
-                    fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                    break
-                except BlockingIOError:
-                    remaining = deadline - time.monotonic()
-                    if remaining <= 0:
-                        raise WorkspaceProvisionError("workspace_busy") from None
-                    time.sleep(min(0.05, remaining))
+                    descriptor = os.open(lock_path, flags | os.O_CREAT | os.O_EXCL, 0o600)
+                    os.fchmod(descriptor, 0o600)
+                except FileExistsError:
+                    descriptor = os.open(lock_path, flags)
+                _lock_descriptors.add(descriptor)
+            self._verify_metadata(os.fstat(descriptor), server.pw_uid, directory=False)
+            with budget.waiting():
+                deadline = time.monotonic() + budget.remaining
+                while True:
+                    try:
+                        fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                        break
+                    except BlockingIOError:
+                        remaining = deadline - time.monotonic()
+                        if remaining <= 0:
+                            raise WorkspaceProvisionError("workspace_busy") from None
+                        time.sleep(min(0.05, remaining))
             yield
         finally:
             try:
                 if descriptor is not None:
-                    os.close(descriptor)
+                    with _descriptor_guard:
+                        _lock_descriptors.discard(descriptor)
+                        os.close(descriptor)
             finally:
                 lock.release()
 
-    def _load_registry(self, server) -> dict:
+    def _load_registry(self, server) -> tuple[dict, tuple | None]:
         _step("registry_read")
         path = os.path.join(self.state_dir, "registry.json")
         if not os.path.lexists(path):
-            return {"version": 1, "users": {}}
+            return {"version": 1, "users": {}}, None
         self._verify_metadata(os.lstat(path), server.pw_uid, directory=False)
+        version = _file_version(path)
 
         def unique_keys(pairs):
             result = {}
@@ -316,11 +540,13 @@ class WorkspaceProvisioner:
             # any planned/group_ready/ready record can drive OS work or success.
             # No in-memory flag can prove durability to a different process.
             self._sync_registry_directory()
-            return registry
+            if _file_version(path) != version:
+                raise WorkspaceProvisionError("workspace_unavailable")
+            return registry, version
         except (ValueError, TypeError, UnicodeError, InvalidUserIdentity):
             raise WorkspaceProvisionError("workspace_state_invalid") from None
 
-    def _save_registry(self, registry: dict) -> None:
+    def _save_registry(self, registry: dict) -> tuple:
         _step("registry_write")
         descriptor, temporary = tempfile.mkstemp(prefix=".registry-", dir=self.state_dir)
         try:
@@ -331,7 +557,11 @@ class WorkspaceProvisioner:
                 target.flush()
                 os.fsync(target.fileno())
             os.replace(temporary, os.path.join(self.state_dir, "registry.json"))
+            version = _file_version(os.path.join(self.state_dir, "registry.json"))
             self._sync_registry_directory()
+            if _file_version(os.path.join(self.state_dir, "registry.json")) != version:
+                raise WorkspaceProvisionError("workspace_unavailable")
+            return version
         finally:
             if os.path.exists(temporary):
                 os.unlink(temporary)
@@ -345,11 +575,11 @@ class WorkspaceProvisioner:
         finally:
             os.close(directory)
 
-    def _choose_name(self, user_id: str, users: dict) -> str:
+    def _choose_name(self, user_id: str, users: dict, snapshot) -> str:
         _step("name_allocation")
         reserved = {record["username"] for record in users.values()}
-        accounts = {record.pw_name for record in pwd.getpwall()}
-        groups = {record.gr_name for record in grp.getgrall()}
+        accounts = {record.pw_name for record in snapshot[0]}
+        groups = {record.gr_name for record in snapshot[1]}
         name = derive_workspace_username(user_id, self.username_prefix)
         for attempt in range(WORKSPACE_NAME_RANDOM_ATTEMPTS + 1):
             if attempt:
@@ -376,18 +606,33 @@ class WorkspaceProvisioner:
             return None
 
     @staticmethod
-    def _occupied(users: dict, own_id: str | None = None) -> tuple[set, set]:
-        uids = {account.pw_uid for account in pwd.getpwall()}
-        gids = {group.gr_gid for group in grp.getgrall()}
+    def _nss_snapshot() -> tuple:
+        return list(pwd.getpwall()), list(grp.getgrall())
+
+    @staticmethod
+    def _occupied(users: dict, snapshot, own_id: str | None = None) -> tuple[set, set]:
+        uids = {account.pw_uid for account in snapshot[0]}
+        gids = {group.gr_gid for group in snapshot[1]}
         for identity, record in users.items():
             if identity != own_id:
                 uids.add(record["uid"])
                 gids.add(record["gid"])
         return uids, gids
 
-    def _allocate(self, users: dict, own_id: str | None = None) -> tuple[int, int]:
+    def _allocate(self, users: dict, snapshot, own_id: str | None = None) -> tuple[int, int]:
         _step("id_allocation")
-        return allocate_workspace_ids(*self._occupied(users, own_id))
+        return allocate_workspace_ids(*self._occupied(users, snapshot, own_id))
+
+    def _commit(self, identity, expected, update, server, budget) -> dict:
+        """Merge one expected transition; callbacks only inspect supplied data."""
+        with self._locked(server, budget):
+            latest, _ = self._load_registry(server)
+            if latest["users"].get(identity) != expected:
+                raise WorkspaceProvisionError("identity_conflict")
+            replacement = update(latest["users"]) if callable(update) else update
+            latest["users"][identity] = replacement
+            self._save_registry(latest)
+            return dict(replacement)
 
     @staticmethod
     def _check_home(record: dict) -> bool:
@@ -420,7 +665,7 @@ class WorkspaceProvisioner:
         ):
             raise WorkspaceProvisionError("identity_conflict")
 
-    def _prepare(self, identity: str, record: dict, registry: dict, server) -> WorkspaceAccount:
+    def _prepare(self, identity: str, record: dict, server, budget) -> tuple[WorkspaceAccount, dict]:
         _step("ownership_check")
         name, home = record["username"], record["home"]
         home_exists = self._check_home(record)
@@ -443,24 +688,36 @@ class WorkspaceProvisioner:
                 raise WorkspaceProvisionError("identity_conflict")
             if group is not None:
                 self._check_group(group, record, server)
-            uids, gids = self._occupied(registry["users"], identity)
-            if group is not None and WORKSPACE_ID_MIN <= group.gr_gid <= WORKSPACE_ID_MAX:
-                # Keep a proven, in-range orphan group. Remove it only from this
-                # allocation snapshot so a full GID pool still permits recovery.
-                gids.discard(group.gr_gid)
-                uid, _ = allocate_workspace_ids(uids, gids)
-                gid = group.gr_gid
-            else:
-                uid, gid = allocate_workspace_ids(uids, gids)
+            snapshot = self._nss_snapshot()
+
+            def recovery_record(users):
+                uids, gids = self._occupied(users, snapshot, identity)
+                if group is not None and WORKSPACE_ID_MIN <= group.gr_gid <= WORKSPACE_ID_MAX:
+                    gids.discard(group.gr_gid)
+                    uid, _ = allocate_workspace_ids(uids, gids)
+                    gid = group.gr_gid
+                else:
+                    uid, gid = allocate_workspace_ids(uids, gids)
+                return {**record, "uid": uid, "gid": gid, "state": "planned"}
+
             if group is not None and not WORKSPACE_ID_MIN <= group.gr_gid <= WORKSPACE_ID_MAX:
+                # Check both pools before touching a proven orphan. Its removal
+                # stays outside the global transaction; a crash retains the old
+                # ready binding and can repeat recovery with the group absent.
+                with self._locked(server, budget):
+                    latest, _ = self._load_registry(server)
+                    if latest["users"].get(identity) != record:
+                        raise WorkspaceProvisionError("identity_conflict")
+                    recovery_record(latest["users"])
                 _run_privileged(["groupdel", name])
                 group = None
-            record.update(uid=uid, gid=gid, state="planned")
-            self._save_registry(registry)
+                snapshot = self._nss_snapshot()
+            record = self._commit(identity, record, recovery_record, server, budget)
             recovered_home = True
 
         if account is None:
-            uids, gids = self._occupied(registry["users"], identity)
+            snapshot = self._nss_snapshot()
+            uids, gids = self._occupied({}, snapshot)
             if group is None:
                 if record["state"] == "group_ready":
                     raise WorkspaceProvisionError("identity_conflict")
@@ -470,20 +727,24 @@ class WorkspaceProvisioner:
                     or not WORKSPACE_ID_MIN <= record["uid"] <= WORKSPACE_ID_MAX
                     or not WORKSPACE_ID_MIN <= record["gid"] <= WORKSPACE_ID_MAX
                 ):
-                    uid, gid = allocate_workspace_ids(uids, gids)
-                    record.update(uid=uid, gid=gid)
-                    self._save_registry(registry)
+                    def reallocate(users):
+                        uid, gid = self._allocate(users, snapshot, identity)
+                        return {**record, "uid": uid, "gid": gid}
+
+                    record = self._commit(identity, record, reallocate, server, budget)
                 _run_privileged(["groupadd", "-g", str(record["gid"]), name])
                 group = self._group(name)
             self._check_group(group, record, server)
             if record["state"] != "group_ready":
-                record["state"] = "group_ready"
-                self._save_registry(registry)
+                record = self._commit(identity, record, {**record, "state": "group_ready"}, server, budget)
             if record["uid"] in uids or not WORKSPACE_ID_MIN <= record["uid"] <= WORKSPACE_ID_MAX:
                 # Its private group already exists and cannot be renumbered.
-                uid, _ = allocate_workspace_ids(uids, set())
-                record["uid"] = uid
-                self._save_registry(registry)
+                def reallocate_uid(users):
+                    occupied_uids, _ = self._occupied(users, snapshot, identity)
+                    uid, _ = allocate_workspace_ids(occupied_uids, set())
+                    return {**record, "uid": uid}
+
+                record = self._commit(identity, record, reallocate_uid, server, budget)
             _run_privileged([
                 "useradd", "-m", "-u", str(record["uid"]), "-g", str(record["gid"]),
                 "-d", home, "-s", "/bin/bash", "-c",
@@ -506,26 +767,38 @@ class WorkspaceProvisioner:
             info = os.stat(home)
             if (info.st_uid, info.st_gid) != (account.pw_uid, account.pw_gid):
                 raise WorkspaceProvisionError("identity_conflict")
-        _run_privileged(["chmod", "2770", home])
-        self._prepare_access(account, server)
+        if stat.S_IMODE(os.stat(home).st_mode) != 0o2770:
+            _run_privileged(["chmod", "2770", home])
+        self._prepare_access(account, server, budget)
         if record["state"] != "ready":
-            record["state"] = "ready"
-            self._save_registry(registry)
-        return WorkspaceAccount(identity, name, home, account.pw_uid, account.pw_gid)
+            record = self._commit(identity, record, {**record, "state": "ready"}, server, budget)
+        return WorkspaceAccount(identity, name, home, account.pw_uid, account.pw_gid), record
 
     @staticmethod
-    def _prepare_access(account, server) -> None:
+    def _prepare_access(account, server, budget) -> None:
         _step("service_access")
         if os.geteuid() != 0:
             group = grp.getgrnam(account.pw_name)
             if server.pw_name not in group.gr_mem:
                 _run_privileged(["usermod", "-aG", account.pw_name, server.pw_name])
-            groups = set(os.getgrouplist(server.pw_name, server.pw_gid)) | set(os.getgroups())
+            with budget.waiting():
+                if not _access_guard.acquire(timeout=budget.remaining):
+                    raise WorkspaceProvisionError("workspace_busy")
             try:
-                os.setgroups(sorted(groups))
-            except PermissionError:
+                # setgroups changes all service threads. Read the union inside
+                # this short lock so concurrent preparations cannot overwrite a
+                # newer process group list with an earlier user's stale snapshot.
+                if account.pw_gid not in os.getgroups():
+                    groups = set(os.getgrouplist(server.pw_name, server.pw_gid)) | set(os.getgroups())
+                    try:
+                        os.setgroups(sorted(groups))
+                    except PermissionError:
+                        if not os.access(account.pw_dir, os.R_OK | os.W_OK | os.X_OK):
+                            raise
                 if not os.access(account.pw_dir, os.R_OK | os.W_OK | os.X_OK):
-                    raise
+                    raise WorkspaceProvisionError("workspace_unavailable")
+            finally:
+                _access_guard.release()
         if not os.access(account.pw_dir, os.R_OK | os.W_OK | os.X_OK):
             raise WorkspaceProvisionError("workspace_unavailable")
         docker_socket = "/var/run/docker.sock"

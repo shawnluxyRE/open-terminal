@@ -8,6 +8,7 @@ from starlette.requests import HTTPConnection
 from open_terminal.env import API_KEY, MULTI_USER
 from open_terminal.utils.fs import UserFS
 from open_terminal.utils.identity import InvalidUserIdentity, WorkspaceProvisionError, validate_user_id
+from open_terminal.utils.limits import run_io
 
 if MULTI_USER:
     from open_terminal.utils.user_isolation import resolve_user
@@ -87,3 +88,14 @@ def get_filesystem(request: Request) -> UserFS:
             detail={"code": code, "message": "Workspace preparation failed"},
         ) from None
     return UserFS(username=username, home=home)
+
+
+async def get_filesystem_async(request: Request) -> UserFS:
+    """Prepare a filesystem off the event loop, preserving get_filesystem errors.
+
+    Service authentication must already have succeeded. Delegate blocking work
+    to a worker; cancellation must not release a worker's preparation locks early.
+    Async command, terminal-create and port handlers use this entry point.
+    Existing synchronous FastAPI dependencies keep get_filesystem.
+    """
+    return await run_io(get_filesystem, request)
