@@ -31,7 +31,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from starlette.formparsers import MultiPartParser, MultiPartException, parse_options_header
 from pydantic import BaseModel, Field, TypeAdapter, ValidationError
 
-from open_terminal.dependencies import get_filesystem, matches_api_key, require_user_identity, verify_api_key
+from open_terminal.dependencies import get_filesystem, get_filesystem_async, matches_api_key, require_user_identity, verify_api_key
 from open_terminal.env import API_KEY, BINARY_FILE_MIME_PREFIXES, CORS_ALLOWED_ORIGINS, ENABLE_NOTEBOOKS, ENABLE_SYSTEM_PROMPT, ENABLE_TERMINAL, EXECUTE_DESCRIPTION, EXECUTE_TIMEOUT, FILE_BROWSER_ROOT, LOG_DIR, MAX_TERMINAL_SESSIONS, MULTI_USER, OPEN_TERMINAL_INFO, PROCESS_LOG_RETENTION, SESSION_CWD_TTL, SYSTEM_PROMPT, TERMINAL_TERM
 from open_terminal.env import sanitized_environ
 from open_terminal.utils.runner import PipeRunner, ProcessRunner, create_runner, read_pty, write_pty, PtyRunner
@@ -1516,7 +1516,7 @@ async def execute(
     ),
 ):
     _cleanup_expired()
-    fs = get_filesystem(http_request)
+    fs = await get_filesystem_async(http_request)
     session_id = http_request.headers.get("x-session-id")
     session_cwd = _get_session_cwd(session_id, fs) if session_id else None
     cwd = fs.resolve_path(request.cwd, cwd=session_cwd) if request.cwd else (session_cwd or fs.home)
@@ -1674,7 +1674,7 @@ from open_terminal.utils.port import detect_listening_ports, get_descendant_pids
 
 
 async def _visible_ports(request: Request) -> list[dict]:
-    fs = get_filesystem(request)
+    fs = await get_filesystem_async(request)
     all_ports = await run_io(detect_listening_ports)
 
     if fs.username:
@@ -1864,6 +1864,12 @@ if ENABLE_TERMINAL:
                 status_code=503,
             )
 
+        if _TERMINAL_BACKEND == "pty":
+            # Finish cancellable preparation before allocating PTY descriptors
+            # and before the final session-limit check. No pending preparation
+            # owns an unregistered PTY or bypasses that check when it resumes.
+            fs = await get_filesystem_async(request)
+
         # Prune dead sessions before checking limit
         if _TERMINAL_BACKEND == "pty":
             dead = [sid for sid, s in _terminal_sessions.items() if s["process"].poll() is not None]
@@ -1891,8 +1897,6 @@ if ENABLE_TERMINAL:
 
             try:
                 fcntl.ioctl(slave_fd, termios.TIOCSWINSZ, struct.pack("HHHH", 24, 80, 0, 0))
-
-                fs = get_filesystem(request)
 
                 # Use per-session cwd if available, else fall back to home
                 chat_id = request.headers.get("x-session-id")

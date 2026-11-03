@@ -2,12 +2,12 @@
 
 - stage：R5
 - result：passed
-- 修订：v1.3，2026-10-29（Asia/Shanghai）；R5 独立复验 R4 修复通过，关闭 R5-001，并完成此前暂缓的清理。
+- 修订：v1.6，2026-11-03（Asia/Shanghai）；R5 独立复验 Docker 可选组修复通过，关闭 R5-PERF-001；原 R5-001 维持 closed。
 - work_dir：`D:\Documents\synowave\WebUI\open-terminal\docs\dev-workflow\opt-user-space`
 - req_dir：`D:\Documents\synowave\WebUI\open-terminal\docs\dev-workflow\opt-user-space\REQ-001`
 - 需求依据：[requirements.md](../requirements.md) v1.10，REQ-001 / AC-001～004、AC-032～033，关联 AC-023/034 的准备恢复契约。
-- 验收依据：[plan.md](plan.md) v1.0、[workspace-identity.md](../../../design/workspace-identity.md) v1.2、[handoff-r4.md](handoff-r4.md) v1.1，以及接口注释、当前实现与测试。
-- 审查对象：分支 `code/opt-req001`，比较基准 `7dab0d6ce15ad9277dc37a85a63f7c4b82213f18`（R2 设计/接口/测试提交）；Open Terminal `0.14.5`。包含 R4 未提交的四个业务文件修改及未跟踪测试、联调脚本和交付记录。开始时的源码摘要与 R4 清单全部一致，审查快照见 [r5-source-start.json](evidence/r5-source-start.json)，业务差异见 [r5-reviewed-production.patch](evidence/r5-reviewed-production.patch)。
+- 验收依据：[plan.md](plan.md) v1.1、[workspace-identity.md](../../../design/workspace-identity.md) v1.4、[handoff-r4.md](handoff-r4.md) v1.3，以及接口注释、当前实现与测试。本轮为 R5-PERF-001 返修复验，原需求与六条 AC 不变。
+- 审查对象：分支 `codex/opt-req001-fix`，比较基准 `59eac68b4c0314ab633c376de82a539af3c98d52`；Open Terminal `0.14.5`。覆盖当前三份业务模块、R2/R3/R4 文档和全部未提交/未跟踪测试。开始时摘要与 R4 性能交付全部一致，见 [本轮起始快照](evidence/r5-perf-001-source-start.json)、[业务差异](evidence/r5-perf-001-reviewed.patch)。历史验收快照和失败证据保留。
 - next_role：R0
 
 ## 产物
@@ -23,12 +23,44 @@
 | [test-organization-r5.md](evidence/test-organization-r5.md) | 本次整理映射、用例保留校验、重新构建及复验记录。 |
 | [recheck-r5.md](evidence/recheck-r5.md) | 历史复查缺陷、失败用例、PTY 复验和环境残留检查；原始失败证据保留。 |
 | [retest-r5-001.md](evidence/retest-r5-001.md) | 本轮独立修复复验、问题关闭及清理记录；最新结论以本交接与该记录为准。 |
+| [test_agent_responsiveness.py](../../../../tests/req001/test_agent_responsiveness.py) | 本次追加 1 项真实路由测试：慢准备期间不分配 PTY；另一就绪用户占满唯一会话槽后，慢请求放闸只能返回 429，不能额外分配 PTY。 |
+| [review-perf-001-r5.md](evidence/review-perf-001-r5.md) | 当前性能修订的源码审查、独立回归、三组同机性能、隔离 WebUI 链路及环境还原证据。 |
+| [test_workspace_fast_path.py](../../../../tests/req001/test_workspace_fast_path.py) | 原 3 项 Docker 组维护失败回归已通过；R4 新增 9 项边界覆盖。本轮 R5 另补 1 项：观察期间 socket GID 持续变化时核心工作空间仍可返回，但不能缓存分歧观察，稳定后恢复零重操作暖路径。 |
+| [test_workspace_recovery.py](../../../../tests/req001/test_workspace_recovery.py) | 本次补充区间外可信孤组正常恢复、groupdel 成功后失败再重试两项；均通过。 |
+| [review-perf-second-r5.md](evidence/review-perf-second-r5.md) | 第二轮历史复查缺陷、6 项补测、旧版本差异验证与原始失败证据。 |
+| [retest-docker-001-r5.md](evidence/retest-docker-001-r5.md) | 本轮独立修复复验、非 root 实际 socket 访问、暖路径及 442 项全量结果，当前结论以本记录与交接为准。 |
 
 R5 修改限于测试、探针与验收文档/证据。初次验收新增独立测试文件，本次按用户更新的规则合入相关已有文件，移除已合并的重复文件，保留所有测试行为；未改业务代码或设计契约，未删除、跳过或削弱原用例，未提交 Git。所有编辑及证据保存均在 Windows；WSL Ubuntu-24.04 仅用于构建、运行和测试；Open WebUI 仓库只读。
 
 ## 验证证据
 
-### v1.3 修复复验（最新）
+### v1.6 R5-PERF-001 修复复验（最新）
+
+- 起始时全部源码/测试摘要与 R4 v1.3 返修交付一致，见 [起始快照](evidence/r5-docker-001-source-start.json)。只读交叉审查确认 socket 路径/跟随目标、GID 和成员完成状态参与失效；可选维护失败或观察分歧只禁止缓存，不拒绝核心工作空间，下一次访问继续维护。原版本/归属/目录 fsync 屏障保持。
+- 固定原标准基线重新构建后，原三项与新增 Docker 边界、暖路径共 **13 passed、14 deselected、1.78 秒，退出 0**；R4 交付的原全量 **441 passed、8 warnings、95.56 秒，退出 0**，见 [定向](evidence/r5-docker-001-targeted.txt)、[原全量](evidence/r5-docker-001-pytest.txt)。
+- R5 补充观察交错用例，单项通过；重新构建后最终全量 **442 passed、8 warnings、96.62 秒，退出 0**，无 skip/xfail，见 [新增用例](evidence/r5-docker-001-churn.txt)、[最终全量](evidence/r5-docker-001-pytest-final.txt)。修复前原 108 个测试函数正文/参数全部保持，见 [校验](evidence/r5-docker-001-test-preservation.json)。
+- 独立标准运行镜像中以服务 UID1000 验证：第一次可选 usermod 失败后 UserFS 仍能读写，工作用户连接真实测试 Unix socket 被拒绝；第二次真实 sudo usermod 成功后，同一用户的新进程能连接 socket；随后 100 次访问不再 usermod。没有连接真实 Docker daemon，见 [非 root 输出](evidence/r5-docker-001-nonroot.txt)。
+- 三次失败后组维护成功、主 GID 已满足、socket 不存在及观察交错解除后的稳定暖路径，100 次采样的九类重操作均为零。新补交错稳定后的 p50/p95=0.176/0.219ms；数值仅为本机证据，不是 SLA。
+- 当前含 REQ-002 的正式测试部署未变；只读快照与 R4 保留部署一致，仍有 5 个空间，见 [部署比较](evidence/r5-docker-001-runtime-comparison.json)。本轮未重新执行 WebUI 链路，先前隔离联调保留为历史证据；本轮全量覆盖非 root、HTTP/WS、PTY 和单用户相关回归。
+- 2026-11-03 追加有边界的回归/性能核查，未发现新的确定问题，passed 结论不变。相同依赖下 Docker 修复前后各做 3 轮×100 次暖访问：无 socket p95 中位数 0.137→0.155ms，已满足 socket 组 0.187→0.248ms，模拟 1000 个组成员 0.458→0.670ms；九类重操作均为零，慢用户闸门下仍独立完成。另一次 64 个新用户/32 worker 冷启动两版均 64 成功，当前总耗时 2.579s、基线 3.266s。方法、绝对差异及回退边界见 [补充核查](evidence/performance-followup-r5.md)；本次未改源码，也未无理由重复 442 项全量。
+
+### v1.5 第二轮复查（历史）
+
+- 本轮业务源码与 v1.4 的 426 项通过快照一致。重新从缓存未完成状态、外部环境变化、多次取消和少见恢复分支检查，发现 R5-PERF-001：缓存未观察 Docker socket，也未阻止可选加组未完成时发布缓存，导致后续访问跳过原有维护/重试。
+- 在相关原测试文件追加 6 项，定向 **3 failed、3 passed、43 deselected、1 warning，1.66 秒，退出 1**：Docker 三场景失败；双取消持锁与区间外孤组正常/中断恢复三项通过。见 [定向结果](evidence/r5-perf-second-targeted.txt)。
+- 同一镜像/依赖、相同新增 Docker 用例，仅在一次性容器内存加载 Windows `git show 59eac68:user_isolation.py` 的历史模块，结果 **3 passed、15 deselected、0.45 秒，退出 0**，见 [基线差异验证](evidence/r5-perf-second-docker-baseline.txt)。确认这是当前性能优化引入的兼容回归，未修改部署或历史源码。
+- 完整回归为 **3 failed、429 passed、8 warnings，94.58 秒，退出 1**，仅 Docker 三项新增回归失败；见 [第二轮报告](evidence/review-perf-second-r5.md)、[全量输出](evidence/r5-perf-second-pytest.txt)。原 105 个 pytest 函数正文/参数保持，新增 3 函数展开为 6 项；保留失败预期，未修改业务代码或弱化原用例。
+
+### v1.4 R2-PERF-001 首轮审查（历史）
+
+- 独立核对异步接入、分层锁/合并提交、版本缓存/持久化三条路径，未发现确定的验收缺陷。慢准备由既有有界执行器承载；每用户锁和短全局事务顺序一致；缓存绑定已确认落盘版本，观察变化/未知 NSS/权限变化进入完整核验，原 R5-001 屏障保持。
+- 使用固定原标准基线重新构建。R4 交付的原 425 项先独立重跑：**425 passed、7 warnings、92.07 秒，退出 0**；补充容量时序用例后全量：**426 passed、8 warnings、94.64 秒，退出 0**。新增单项也独立通过，无 skip/xfail；见 [初次全量](evidence/r5-perf-001-pytest-initial.txt)、[最终全量](evidence/r5-perf-001-pytest.txt)、[新增单项](evidence/r5-perf-001-targeted.txt)。
+- 独立 AST 比较确认 R4 交付的原 104 个 pytest 函数正文/参数均保持，仅追加 1 个函数，见 [测试保留校验](evidence/r5-perf-001-test-preservation.json)。warnings 为已知 TestClient/httpx、真实 PTY 的 utcnow 及专门多线程 fork 回归提示。
+- 三组同机独立测量：59eac68 暖访问 p50/p95=**2.761/4.106 ms**，当前实现=**0.121/0.187 ms**；当前连续 100 次暖访问九类观测重操作全部为零。慢 B 在 useradd 闸门暂停时，A 在放闸前约 **3.362 ms** 完成。旧无版本缓存仅作语义不同的延迟参考，见 [性能汇总](evidence/r5-perf-001-benchmark-summary.json)。
+- 当前源码标准镜像在独立非 root 容器经真实 WebUI v0.12.3 验证 A/B 文件、命令、ports、PTY 精确身份及用户/聊天归属，全部通过；没有新增真实账号/聊天。临时连接与容器均已移除，原配置内容恢复，原部署 5 个空间及生产模块前后快照完全相同，见 [联调输出](evidence/r5-perf-001-webui.txt)、[运行态比较](evidence/r5-perf-001-runtime-comparison.json)、[连接清理核验](evidence/r5-perf-001-webui-cleanup.json)。
+- 本轮生产代码未改，源码收尾校验见 [最终快照](evidence/r5-perf-001-source-final.json)。详细命令、镜像与验证边界见 [review-perf-001-r5.md](evidence/review-perf-001-r5.md)。
+
+### v1.3 R5-001 修复复验（历史）
 
 - 当前源码/测试摘要与 R4 v1.1 返修交付全部一致，见 [起始快照](evidence/r5-r5-001-source-start.json)。只读复核确认：完整校验既有清单后，在同一准备锁内完成目录 fsync，随后才允许系统创建或 ready 返回；保存新状态仍遵循文件 fsync→replace→目录 fsync。故障按原错误链返回不可用，不依赖内存标记。
 - R5 重新构建独立测试镜像，原 3 项失败回归与 R4 新增三状态用例 **6 passed、40 deselected、0.59 秒、退出 0**；全量 **389 passed、1 warning、45.86 秒、退出 0**，无 skip/xfail，见 [定向结果](evidence/r5-r5-001-targeted.txt)、[全量结果](evidence/r5-r5-001-pytest.txt)、[构建日志](evidence/r5-r5-001-build.txt)。
@@ -71,9 +103,9 @@ R5 阅读了 [R4 浏览器截图](evidence/r4-webui-a.png)，可见普通账号 
 
 ## 本轮决策
 
-**REQ-001 当前恢复 `passed`，R5-001 已关闭。** 读取清单后的持久化确认已在锁内补齐，原失败用例及三状态补测、389 项全量回归和实际服务回归均经 R5 独立执行通过，未发现新的验收阻碍。
+**当前性能 fix 恢复 `passed`，R5-PERF-001 已关闭；原 R5-001 维持关闭。** 可选组维护的失败重试和 socket 变化失效已修复，普通工作空间可用性与稳定暖路径性能保持。原失败用例、补充交错、442 项全量及独立非 root 实际权限验证均通过，未发现新的确定验收阻碍。
 
-复验对象为当前未提交工作区修复快照，最新摘要见 [r5-r5-001-source-final.json](evidence/r5-r5-001-source-final.json)。生产修复由 R4 完成，R5 本轮只读审查、验证并更新证据；实际运行镜像为 R4 部署的 `sha256:d30964f7047ed9b6375b7f1d5538fb5810d25467c695111e132a79e6ba57c1ab`，本轮未重新部署或修改 `.env`。
+本结论覆盖 `codex/opt-req001-fix` 当前未提交返修快照，见 [本轮最终摘要](evidence/r5-docker-001-source-final.json)。R5 本轮只追加 1 项测试并维护交接/证据，业务实现未改。当前正式测试部署已含 REQ-002，**本性能分支尚未替换该部署**；本轮使用禁网、无正式卷/socket 挂载的一次性容器，后续发布仍需与当前部署统一集成。
 
 恢复仍以保留完整 `/home`（包含 `.open-terminal/registry.json`）和映射配置为前提；不将单独丢失归属清单后重建映射纳入已通过承诺。真实保留卷重建、服务器重启、兼容升级、个人依赖以及全面路径/符号链接授权分别留在 REQ-007、REQ-005、REQ-002 的范围，未据本轮结果宣称通过。Notebook 保留且关闭，配额与任意命令对抗隔离不在本轮范围。
 
@@ -82,6 +114,22 @@ R5 阅读了 [R4 浏览器截图](evidence/r4-webui-a.png)，可见普通账号 
 整理后曾创建的四个重复空聊天已于本轮复验通过后清理，原始 R4 与 R5 验收聊天保留。历史首次准备证据仍由初次 R5 联调记录提供。
 
 ## R4 修订汇总
+
+### R5-PERF-001 [P2] ready 缓存跳过可选 Docker 组维护及失败重试（已关闭）
+
+- 关联需求/任务：R2-PERF-001 / T-009～T-010；设计 [workspace-identity.md](../../../design/workspace-identity.md) 第 174 行要求保留可选 Docker socket 组行为，第 160、190～194 行规定缓存发布与异常/变化后的重验。
+- 涉及位置（修复前）：`user_isolation.py:308–333` 的 `_observe_ready` 未观察 `/var/run/docker.sock` 与相应组成员完成情况；`:336–347` 稳定命中直接返回；`:778–785` 可选附加组维护只在慢路径执行，失败仅警告后仍可发布 ready 缓存。
+- 预期与实际：Docker socket 和组在首次准备前已存在时，只注入一次可选 `usermod` 失败；普通 workspace 仍可返回，故障解除后下一次访问应继续原有加组维护。当前实际两次 resolve 只尝试一次 usermod，用户仍不在 socket 组。socket 在预热后出现、或切换到另一预先存在的 GID 且 NSS 未变时，也被缓存漏掉。
+- 复现与影响：新增 `test_ready_reuse_maintains_optional_docker_socket_access` 三参数用例使用真实 AF_UNIX socket、真实账号/组；当前三项失败，59eac68 同样三项通过。会使已配置的可选 Docker 用法持续无权限，直到其他事件触发完整重验；不影响普通 home 绑定，也未证明数据丢失或跨用户访问。
+- 处理请求：R4 将可选 socket 变化和组维护未完成纳入重验/缓存失效条件，保留“可选失败不阻断普通工作空间”的既有语义，并保持稳定已完成状态的暖路径零重复重操作。不要通过每次无条件 usermod 或弱化回归规避缓存契约；修复后运行三项新回归、其余补测、原完整回归及必要的性能验证。
+- R4 回复与 R5 复验：R4 v1.3 将 socket/目标/GID/成员完成状态纳入观察，未完成或观察失败不缓存；可选变化与核心确认分开，保持普通空间可用。R5 独立执行原失败回归、13 项定向、442 项全量、持续观察变化补测和 UID1000 的实际 UserFS/Unix socket 权限测试，全部通过；稳定暖路径九类重操作仍为零。**状态 closed，2026-11-03**，历史失败证据保留。
+
+### R2-PERF-001 后台准备、分层锁与 ready 快速路径（验收通过）
+
+- 关联需求/任务：REQ-001 并发唯一归属、Agent 正常可用性及 T-007～T-010，设计 v1.4 的性能/并发契约；不新增配额或命令隔离边界。
+- R4 交付：异步手动入口使用既有 run_io；慢 OS/NSS 工作移出全局清单锁；按完整 ID 串行并只合并本用户记录；进程内缓存绑定确认版本并可靠失效；保留跨用户未确认提交屏障、fork 和非 root 访问修复。
+- R5 复核/验证：独立只读交叉审查、425 项原测试复跑、1 项 PTY 容量补测及最终 426 项全量、三组性能比较、标准镜像隔离 WebUI 双用户回归全部通过，原 104 个测试函数未改。结果不依赖直接复述 R4 报告。
+- 处理状态：首轮 426 项通过后，第二轮曾发现 R5-PERF-001；该兼容性问题现已修复并独立复验关闭，性能修订恢复通过。旧性能/联调数字仍作为其各轮实际证据，不冒充本次新测量。
 
 ### R5-001 [P2] 未确认持久化的清单状态在重试时继续使用（已关闭）
 
@@ -94,8 +142,12 @@ R5 阅读了 [R4 浏览器截图](evidence/r4-webui-a.png)，可见普通账号 
 
 ## 环境残留检查
 
+2026-11-03 本轮仅使用一次性禁网容器，测试 Unix socket 由测试拥有并关闭/移除，测试结束容器自动删除；无正式 Docker socket 或数据卷挂载，没有更改部署、WebUI 配置、账号或聊天。
+
+2026-11-02 本轮新增的临时服务 `req001-perf-r5-20261102` 和临时 WebUI 连接已清理；两个原服务健康、两个持久卷保留，原 5 个空间及生产模块完全不变。没有清理其他需求镜像或数据，也没有执行全局 prune。下文保留 2026-10-29 清理记录。
+
 项目未发现 `__pycache__`、pytest 缓存、构建目录、临时/备份文件；无遗留测试容器，两个部署容器健康。上轮列出的 `req001-r2-tests`、`req001-r4-tests`、`req001-r5-tests` 三个旧镜像已核对未被容器使用后删除；四个重复聊天在重新核对所属账号、标题、零消息后删除，并验证原始验收聊天仍可访问。详见 [镜像清理](evidence/r5-r5-001-image-cleanup.txt)、[聊天清理](evidence/r5-r5-001-chat-cleanup.json)、[最终核验](evidence/r5-r5-001-cleanup-summary.json)。当前修复/复现镜像、固定构建基线/回滚镜像、业务数据卷、账号/home、证据、部署备份与服务运行时文件保留，没有执行全局 prune。
 
 ## 下一步
 
-**接收角色：R0。处理结论：REQ-001 `passed`，R5-001 `closed`，此前暂缓的明确残留已清理。** 请登记验收完成并决定后续需求或提交安排。本轮未自动向其他角色对话发送消息或提交 Git。
+**接收角色：R0。处理结论：当前性能 fix `passed`，R5-PERF-001 `closed`，原 R5-001 维持 `closed`。** 请登记本轮修复验收完成；后续提交/发布由用户安排，并先与当前含 REQ-002 的版本统一集成。未提交、推送、修改正式部署或自动推进其他角色对话。

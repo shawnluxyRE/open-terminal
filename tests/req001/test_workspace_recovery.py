@@ -6,6 +6,7 @@ the disposable-container fixture imported below.
 """
 
 from concurrent.futures import ProcessPoolExecutor
+import errno
 import grp
 import hashlib
 import json
@@ -426,3 +427,70 @@ def test_processes_share_one_consistent_initialization_journal(workspace, scenar
         assert "pc_19042bfe" in {account.username for account in accounts}
         for user_id, account in zip(identities, accounts):
             assert WorkspaceProvisioner(**options).resolve(user_id) == account
+
+
+@pytest.mark.parametrize("interrupt_after_group_removal", [False, True], ids=["normal", "retry-after-groupdel"])
+def test_verified_out_of_range_orphan_group_recovers_in_range_without_losing_home(
+    workspace, monkeypatch, interrupt_after_group_removal
+):
+    """AC-034: replace only a proven orphan group, retaining its full-ID home."""
+    provisioner, options, identity = workspace
+    original = binding(options, identity, uid=free_uid(25001), gid=free_gid(26001))
+    name, home = original["username"], Path(original["home"])
+    run_account_tool("groupadd", "-g", str(original["gid"]), name)
+    run_account_tool(
+        "useradd", "-m", "-s", "/bin/bash", "-d", str(home),
+        "-u", str(original["uid"]), "-g", str(original["gid"]),
+        "-c", "ot-" + hashlib.sha256(identity.encode("utf-8")).hexdigest(), name,
+    )
+    registry = write_registry(options, {identity: original})
+    sentinel = home / "keep-out-of-range-home.txt"
+    sentinel.write_text("same data after orphan-group recovery", encoding="utf-8")
+    sentinel.chmod(0o640)
+    run_account_tool("chown", f"{name}:{name}", str(sentinel))
+    existing = provisioner.resolve(identity)
+    assert (existing.uid, existing.gid) == (original["uid"], original["gid"])
+
+    run_account_tool("userdel", name)  # Keep the complete home and registry.
+    try:
+        orphan = grp.getgrnam(name)
+    except KeyError:
+        # Some distributions delete an unused same-name group with userdel.
+        run_account_tool("groupadd", "-g", str(original["gid"]), name)
+        orphan = grp.getgrnam(name)
+    assert orphan.gr_gid == original["gid"]
+    before_marker = (sentinel.stat().st_uid, sentinel.stat().st_gid, sentinel.stat().st_mode)
+    real_command = user_isolation._run_privileged
+    removed_groups = []
+
+    def observe_group_removal(command):
+        result = real_command(command)
+        if command == ["groupdel", name]:
+            removed_groups.append(name)
+            if interrupt_after_group_removal:
+                # The OS removal happened, but no replacement reservation has
+                # been committed yet. Model failure at that external boundary.
+                raise OSError(errno.EIO, "injected failure after orphan-group removal")
+        return result
+
+    monkeypatch.setattr(user_isolation, "_run_privileged", observe_group_removal)
+    if interrupt_after_group_removal:
+        with pytest.raises(WorkspaceProvisionError) as interrupted:
+            WorkspaceProvisioner(**options).resolve(identity)
+        assert interrupted.value.code == "workspace_unavailable"
+        assert json.loads(registry.read_text(encoding="utf-8"))["users"][identity] == original
+        with pytest.raises(KeyError):
+            grp.getgrnam(name)
+        assert (sentinel.stat().st_uid, sentinel.stat().st_gid, sentinel.stat().st_mode) == before_marker
+        assert sentinel.read_text(encoding="utf-8") == "same data after orphan-group recovery"
+
+    recovered = WorkspaceProvisioner(**options).resolve(identity)
+    assert_ready_account(recovered, identity, options["home_root"])
+    assert (recovered.username, recovered.home) == (name, str(home))
+    assert recovered.uid != original["uid"] and recovered.gid != original["gid"]
+    assert removed_groups == [name]
+    assert sentinel.read_text(encoding="utf-8") == "same data after orphan-group recovery"
+    assert sentinel.stat().st_mode & 0o7777 == 0o640
+    assert (sentinel.stat().st_uid, sentinel.stat().st_gid) == (recovered.uid, recovered.gid)
+    saved = json.loads(registry.read_text(encoding="utf-8"))["users"][identity]
+    assert saved == {**original, "uid": recovered.uid, "gid": recovered.gid}
